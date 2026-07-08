@@ -71,17 +71,35 @@
 
 ## Traceability
 
-Populated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (pending roadmap) | | |
+| INFRA-01 | Phase 1 | Pending |
+| AUDIO-01 | Phase 1 | Pending |
+| AUDIO-02 | Phase 1 | Pending |
+| AUDIO-03 | Phase 1 | Pending |
+| AUDIO-04 | Phase 1 | Pending |
+| AUDIO-05 | Phase 1 | Pending |
+| ALIGN-01 | Phase 2 | Pending |
+| ALIGN-02 | Phase 2 | Pending |
+| ALIGN-03 | Phase 2 | Pending |
+| ALIGN-04 | Phase 2 | Pending |
+| STORY-01 | Phase 3 | Pending |
+| STORY-02 | Phase 3 | Pending |
+| STORY-03 | Phase 3 | Pending |
+| VIDEO-01 | Phase 4 | Pending |
+| VIDEO-02 | Phase 4 | Pending |
+| VIDEO-03 | Phase 4 | Pending |
+| VIDEO-04 | Phase 4 | Pending |
+| POST-01 | Phase 5 | Pending |
+| POST-02 | Phase 5 | Pending |
+| PLAT-01 | Phase 6 | Pending |
+| PLAT-02 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 20 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 20 ⚠️
+- v1 requirements: 21 total (note: REQUIREMENTS.md header said 20; count corrected — 21 IDs present)
+- Mapped to phases: 21
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-08*
-*Last updated: 2026-07-08 after initial definition*
+*Last updated: 2026-07-08 after roadmap creation — traceability populated*
