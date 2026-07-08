@@ -49,8 +49,11 @@ everything else is mediocre but sync is tight, it still works. If sync is off, n
 
 ## Constraints
 
-- **Hardware**: No local GPU → GPU stages run on Colab (prototype) / Modal-RunPod (prod). Design the
-  GPU stage as a swappable HTTP endpoint from day one.
+- **Hardware**: No local GPU → GPU stages run on **free-tier Colab** now (ephemeral URL, ~90-min idle
+  timeout, daily GPU caps) / Modal-RunPod later. Design the GPU stage as a swappable HTTP endpoint from day one.
+- **Voice**: The cloned Indian reference voice from Colab is persisted and reused as the default speaker
+  across all generations (AUDIO-05).
+- **Future**: Telegram bot submission is planned for v2 (BOT-01) — keep the pipeline callable headlessly.
 - **Tech stack**: VibeVoice (TTS), WhisperX (forced align), Remotion (video), ffmpeg (post), Gradio (UI).
 - **TTS limits**: VibeVoice is unstable on numbers/code/symbols and inputs under ~3 words → normalize
   text before synthesis; keep a raw→spoken map for captions.
