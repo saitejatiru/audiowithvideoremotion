@@ -23,36 +23,65 @@ def build_ui():
             "and Remotion rendering."
         )
 
-        with gr.Row():
-            with gr.Column():
-                script_input = gr.Textbox(
-                    label="Video Script",
-                    lines=6,
-                    placeholder="Enter the text you want the avatar to speak...",
-                    value="Welcome to the VibeVoice pipeline! We are generating a video with perfect lip sync."
-                )
-                voice_dropdown = gr.Dropdown(
-                    choices=voices,
-                    value=default_voice,
-                    label="Voice Identity"
-                )
-                backend_url = gr.Textbox(
-                    label="Colab TTS Backend URL (Optional)",
-                    value=DEFAULT_BACKEND,
-                    placeholder="https://xxxxx.gradio.live — leave blank to use local CPU"
-                )
-                generate_btn = gr.Button("Generate Video", variant="primary")
+        with gr.Tabs():
+            with gr.Tab("Generate Video"):
+                with gr.Row():
+                    with gr.Column():
+                        script_input = gr.Textbox(
+                            label="Video Script",
+                            lines=6,
+                            placeholder="Enter the text you want the avatar to speak...",
+                            value="Welcome to the VibeVoice pipeline! We are generating a video with perfect lip sync."
+                        )
+                        voice_dropdown = gr.Dropdown(
+                            choices=voices,
+                            value=default_voice,
+                            label="Voice Identity"
+                        )
+                        backend_url = gr.Textbox(
+                            label="Colab TTS Backend URL (Optional)",
+                            value=DEFAULT_BACKEND,
+                            placeholder="https://xxxxx.gradio.live — leave blank to use local CPU"
+                        )
+                        generate_btn = gr.Button("Generate Video", variant="primary")
 
-            with gr.Column():
-                status_output = gr.Textbox(label="Pipeline Status", interactive=False)
-                video_output = gr.Video(label="Generated Video")
+                    with gr.Column():
+                        status_output = gr.Textbox(label="Pipeline Status", interactive=False)
+                        video_output = gr.Video(label="Generated Video")
 
-        # Connect the generator function to the UI button
-        generate_btn.click(
-            fn=orchestrate_video,
-            inputs=[script_input, voice_dropdown, backend_url],
-            outputs=[status_output, video_output],
-        )
+                # Connect the generator function to the UI button
+                generate_btn.click(
+                    fn=orchestrate_video,
+                    inputs=[script_input, voice_dropdown, backend_url],
+                    outputs=[status_output, video_output],
+                )
+
+            with gr.Tab("Clone Voice"):
+                gr.Markdown("Upload a short 5-15s clear audio clip to clone a new voice.")
+                with gr.Row():
+                    with gr.Column():
+                        clone_name = gr.Textbox(label="New Voice Name", placeholder="e.g. my-custom-voice")
+                        clone_audio = gr.Audio(type="filepath", label="Reference Audio")
+                        clone_btn = gr.Button("Clone Voice")
+                    with gr.Column():
+                        clone_status = gr.Textbox(label="Status", interactive=False)
+                
+                def _do_clone(name, path):
+                    if not name or not path:
+                        return "Error: Name and audio required", gr.update()
+                    from tts.voice_store import register_voice
+                    try:
+                        register_voice(name, path)
+                        new_voices = list_voice_ids()
+                        return f"Success! '{name}' is ready to use.", gr.update(choices=new_voices, value=name)
+                    except Exception as e:
+                        return f"Error: {e}", gr.update()
+
+                clone_btn.click(
+                    fn=_do_clone,
+                    inputs=[clone_name, clone_audio],
+                    outputs=[clone_status, voice_dropdown]
+                )
 
     return demo
 
