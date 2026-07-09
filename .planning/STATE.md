@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 2 of 6 (Alignment Engine)
-Plan: 3 of 3 in current phase
-Status: In progress
-Last activity: 2026-07-09 — Plan 02-03 complete: ASR-WER verifier + whisper-timestamped fallback (ALIGN-02, ALIGN-04)
+Plan: 4 of 4 in current phase
+Status: Phase 2 code complete — awaiting Colab GPU isolation gate before Phase 4 begins
+Last activity: 2026-07-09 — Plan 02-04 complete: align_pipeline.py orchestrator + pipeline unit tests + Colab isolation scripts (ALIGN-01..04)
 
-Progress: [██████░░░░] ~33%
+Progress: [███████░░░] ~38%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 3 min
-- Total execution time: 0.23 hours
+- Total execution time: 0.26 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-contracts-text-prep | 3 | 9 min | 3 min |
-| 02-alignment-engine | 3 | 10 min | 3.3 min |
+| 02-alignment-engine | 4 | 13 min | 3.25 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 4 min, 2 min, 3 min, 3 min
+- Last 5 plans: 4 min, 2 min, 3 min, 3 min, 3 min
 - Trend: fast
 
 *Updated after each plan completion*
@@ -65,6 +65,9 @@ Recent decisions affecting current work:
 - Verifier (02-03): heavy imports (whisper, jiwer, whisper_normalizer) deferred inside compute_wer() — module loads on Windows without GPU
 - Verifier (02-03): EnglishTextNormalizer lazy-inited as global _normalizer inside compute_wer() body (avoids grep false-positive from helper fn name)
 - Fallback (02-03): whisper_timestamped guarded inside fallback_align() body; nan_ratio() exported for pipeline's structural failure detection
+- Pipeline (02-04): AlignmentDriftError raised (not silent fallback) on WER > threshold — Phase 6 catches and retries TTS once, then calls use_fallback=True
+- Pipeline (02-04): NaN ratio check runs before WER guard — avoids wasted Whisper inference on structurally broken alignment
+- Pipeline (02-04): Phase 4 BLOCKED until isolation_test.py passes on Colab GPU with TEST_CLIP_PATH set
 
 ### Pending Todos
 
@@ -73,10 +76,10 @@ None yet.
 ### Blockers/Concerns
 
 - Colab GPU URL is ephemeral (~90-min idle timeout); Phase 1 HTTP contract must handle URL churn transparently
-- Phase 2 (alignment) is the critical path — do not start Phase 4 (Remotion render) until Phase 2 is verified with a real clip and WER is at acceptable levels
+- **ACTIVE GATE:** Phase 2 code complete — isolation_test.py must pass on Colab GPU before Phase 4 begins. Run: `python align/isolation_test.py` with TEST_CLIP_PATH set and GPU available. Gate clears when output prints "PHASE 2 ISOLATION GATE: PASSED".
 
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed 02-03-PLAN.md — ASR-WER verifier + fallback committed (74213fb, df99a71)
+Stopped at: Completed 02-04-PLAN.md — align_pipeline.py + tests + Colab isolation scripts (8549c15, c4b7146)
 Resume file: None

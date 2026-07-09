@@ -57,7 +57,7 @@ Plans:
 - [ ] 02-01-PLAN.md — Test scaffold: conftest.py + test stubs for all ALIGN-XX requirements (RED state)
 - [ ] 02-02-PLAN.md — Aligner + Schema: WhisperX forced alignment (ALIGN-01) + timeline.json builder (ALIGN-03)
 - [ ] 02-03-PLAN.md — WER Guard + Fallback: ASR-WER verifier (ALIGN-02) + whisper-timestamped adapter (ALIGN-04)
-- [ ] 02-04-PLAN.md — Pipeline integration + isolation verification gate before Phase 4
+- [x] 02-04-PLAN.md — Pipeline integration + isolation verification gate before Phase 4
 
 ### Phase 3: Storyboard
 **Goal**: LLM produces validated per-sentence scene content (visual type, on-screen text, keyword) whose timing is clamped entirely to sentence boundaries from timeline.json — the LLM never sets durations.
@@ -107,7 +107,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Contracts & Text Prep | 3/3 | Complete   | 2026-07-09 |
-| 2. Alignment Engine | 3/4 | In Progress|  |
+| 2. Alignment Engine | 4/4 | Code complete — Colab gate pending | 2026-07-09 |
 | 3. Storyboard | 0/TBD | Not started | - |
 | 4. Remotion Render | 0/TBD | Not started | - |
 | 5. Post-processing | 0/TBD | Not started | - |
