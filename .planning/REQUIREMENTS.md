@@ -7,11 +7,11 @@
 
 ### Audio (TTS)
 
-- [ ] **AUDIO-01**: User can input a script and get VibeVoice narration audio back
-- [ ] **AUDIO-02**: User can select a voice, including an Indian voice
-- [ ] **AUDIO-03**: User can clone a voice from a short reference clip
-- [ ] **AUDIO-04**: Script is normalized (numbers/symbols/code) before synthesis, keeping a raw→spoken map for captions
-- [ ] **AUDIO-05**: The cloned reference voice (the Indian voice created in Colab) is saved and reused as the default speaker for all generated audio
+- [x] **AUDIO-01**: User can input a script and get VibeVoice narration audio back
+- [x] **AUDIO-02**: User can select a voice, including an Indian voice
+- [x] **AUDIO-03**: User can clone a voice from a short reference clip
+- [x] **AUDIO-04**: Script is normalized (numbers/symbols/code) before synthesis, keeping a raw→spoken map for captions
+- [x] **AUDIO-05**: The cloned reference voice (the Indian voice created in Colab) is saved and reused as the default speaker for all generated audio
 
 ### Alignment (Sync)
 
@@ -45,7 +45,7 @@
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: GPU stages (TTS, alignment) run behind a stable HTTP contract — **free-tier Colab** now (note its limits: ephemeral URL, ~90-min idle timeout, daily GPU caps), swappable to Modal/RunPod
+- [x] **INFRA-01**: GPU stages (TTS, alignment) run behind a stable HTTP contract — **free-tier Colab** now (note its limits: ephemeral URL, ~90-min idle timeout, daily GPU caps), swappable to Modal/RunPod
 
 ## v2 Requirements
 
@@ -73,12 +73,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 1 | Pending |
-| AUDIO-01 | Phase 1 | Pending |
-| AUDIO-02 | Phase 1 | Pending |
-| AUDIO-03 | Phase 1 | Pending |
-| AUDIO-04 | Phase 1 | Pending |
-| AUDIO-05 | Phase 1 | Pending |
+| INFRA-01 | Phase 1 | Complete |
+| AUDIO-01 | Phase 1 | Complete |
+| AUDIO-02 | Phase 1 | Complete |
+| AUDIO-03 | Phase 1 | Complete |
+| AUDIO-04 | Phase 1 | Complete |
+| AUDIO-05 | Phase 1 | Complete |
 | ALIGN-01 | Phase 2 | Pending |
 | ALIGN-02 | Phase 2 | Pending |
 | ALIGN-03 | Phase 2 | Pending |
