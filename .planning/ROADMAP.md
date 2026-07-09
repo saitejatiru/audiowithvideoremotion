@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Contracts & Text Prep** - GPU HTTP endpoint live, script normalizer running, timeline.json schema defined, default voice persisted (completed 2026-07-09)
 - [ ] **Phase 2: Alignment Engine** - Word-level timestamps from forced alignment, ASR-WER guard, timeline.json emitted
 - [x] **Phase 3: Storyboard** - LLM generates schema-validated scene content per sentence (completed 2026-07-09)
-- [ ] **Phase 4: Remotion Render** - Video synced to audio with word-level captions and correct duration
+- [x] **Phase 4: Remotion Render** - Video synced to audio with word-level captions and correct duration (completed 2026-07-09)
 - [ ] **Phase 5: Post-processing** - Metadata stripped, output web-ready
 - [ ] **Phase 6: Platform** - Gradio UI + orchestrator runs the full pipeline end-to-end
 
@@ -84,7 +84,12 @@ Plans:
   2. Word-level captions appear and disappear frame-accurately — each word's display window matches its start/end timestamps in timeline.json
   3. The rendered video's total duration matches the actual audio duration to within one frame (ceil(durationSec * fps)); no cutoff or trailing silence
   4. When the audio contains multiple speakers, captions for each speaker are visually distinct (different color or position)
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [x] 04-01-PLAN.md — Remotion Project Scaffold (TS compiles)
+- [x] 04-02-PLAN.md — Scene and Caption Components: SceneRenderer + CaptionRenderer (speaker-colored)
+- [x] 04-03-PLAN.md — Render Bridge: Python subprocess adapter to npx remotion (9 tests passed)
 
 ### Phase 5: Post-processing
 **Goal**: The rendered MP4 is stripped of all container and stream-level metadata and fingerprints, and remains correctly web-streamable after stripping.
@@ -115,6 +120,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Contracts & Text Prep | 3/3 | Complete   | 2026-07-09 |
 | 2. Alignment Engine | 4/4 | Code complete — Colab gate pending | 2026-07-09 |
 | 3. Storyboard | 4/4 | Code complete — LLM test needs API key | 2026-07-09 |
-| 4. Remotion Render | 0/TBD | Not started | - |
+| 4. Remotion Render | 3/3 | Code complete — needs Colab headless test | 2026-07-09 |
 | 5. Post-processing | 0/TBD | Not started | - |
 | 6. Platform | 0/TBD | Not started | - |

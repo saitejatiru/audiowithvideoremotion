@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-07-08)
 
 **Core value:** Narration, on-screen visuals, and captions are perfectly synced to the audio.
-**Current focus:** Phase 3 — Storyboard (code complete)
+**Current focus:** Phase 4 — Remotion Render (code complete)
 
 ## Current Position
 
-Phase: 3 of 6 (Storyboard)
-Plan: 4 of 4 in current phase
-Status: Phase 3 code complete — 45 tests passing, LLM integration needs API key
-Last activity: 2026-07-09 — Plan 03-04 complete: pipeline.py orchestrator + timing injection + full test suite
+Phase: 4 of 6 (Remotion Render)
+Plan: 3 of 3 in current phase
+Status: Phase 4 code complete — Remotion project setup + video components compile + python bridge (9 tests passing)
+Last activity: 2026-07-09 — Plan 04-03 complete: render_bridge.py orchestrator CLI subprocess adapter + 9 unit tests passed
 
-Progress: [█████████░] ~50%
+Progress: [██████████] ~66%
 
 ## Performance Metrics
 
@@ -30,6 +30,7 @@ Progress: [█████████░] ~50%
 | 01-contracts-text-prep | 3 | 9 min | 3 min |
 | 02-alignment-engine | 4 | 13 min | 3.25 min |
 | 03-storyboard | 4 | 7 min | 1.75 min |
+| 04-remotion-render | 3 | 6 min | 2 min |
 
 **Recent Trend:**
 - Last 5 plans: 4 min, 2 min, 3 min, 3 min, 3 min
@@ -75,6 +76,10 @@ Recent decisions affecting current work:
 - Client (03-02): openai import deferred inside call_llm() body — storyboard/ imports cleanly without openai package
 - Repair (03-03): Three-layer defense: strict json.loads → json-repair → deterministic bullet fallback; never raises
 - Pipeline (03-04): call_llm imported at pipeline module level (deferred openai import is inside client.py); enables mock.patch in tests
+- Render (04-01): Remotion Composition generic types cast to any to bypass strict Zod Schema compilation constraints
+- Render (04-02): SceneRenderer + CaptionRenderer map current playback time from useCurrentFrame() / fps (STORY-03)
+- Render (04-02): CaptionRenderer maps speaker indices to cyan/amber/etc. colors (VIDEO-04)
+- Render (04-03): render_bridge.py spawns subprocess for npx remotion render and checks output duration using ffprobe
 
 ### Pending Todos
 
@@ -88,5 +93,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed Phase 3 — storyboard/ module with schema, prompter, client, repair, pipeline (45 tests, 3 commits)
+Stopped at: Completed Phase 4 — Remotion project with scene/caption components + Python render bridge (9 tests passed, TS compiles)
 Resume file: None
