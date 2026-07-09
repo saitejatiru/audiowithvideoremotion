@@ -28,6 +28,11 @@ def _build_registry() -> None:
     for pt in sorted(_VOICES_DIR.glob("**/*.pt")):
         _registry[pt.stem] = str(pt.resolve())
 
+    # Reference WAVs shipped with the repo (1.5B/Large voice cloning inputs).
+    # setdefault: a same-named .pt wins; server converts per model size.
+    for wav in sorted((_REPO_ROOT / "VibeVoice" / "demo" / "voices").glob("*.wav")):
+        _registry.setdefault(wav.stem, str(wav.resolve()))
+
     # Register default Indian voice
     wav_path = _UPLOAD_DIR / "default_indian.wav"
     pt_path = _VOICES_DIR / "in-Samuel_man.pt"

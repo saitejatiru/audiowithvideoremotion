@@ -29,8 +29,24 @@ export interface TimelineSentence {
 }
 
 export interface SceneVisual {
-  type: "bullet" | "image" | "code";
+  type:
+    | "bullet"
+    | "image"
+    | "code"
+    | "big-number"
+    | "comparison"
+    | "chart"
+    | "steps"
+    | "formula"
+    | "diagram";
   query: string;
+  image?: string; // public/-relative diagram file (set by asset fetcher)
+  credit?: string; // license attribution for the diagram
+}
+
+export interface SceneChart {
+  labels: string[];
+  values: number[];
 }
 
 export interface TimelineScene {
@@ -40,6 +56,11 @@ export interface TimelineScene {
   end: number;
   onScreenText: string;
   visual: SceneVisual;
+  title?: string;
+  bullets?: string[];
+  emoji?: string;
+  chart?: SceneChart;
+  formula?: string;
 }
 
 export interface TimelineMeta {

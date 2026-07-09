@@ -50,17 +50,48 @@ def run_vibevoice(text: str, speaker_id: str, cfg_scale: float = 1.5):
     import copy
     import torch
 
-    from tts.vibevoice_loader import load
+    from tts.vibevoice_loader import is_streaming, load
 
     voice_path = voice_store.get_voice_path(speaker_id)
     mdl, proc, device = load()
 
+    if not is_streaming():
+        # 1.5B/Large: TRUE voice cloning — conditions on a reference WAV.
+        if voice_path.endswith(".pt"):
+            # .pt cached prompts are 0.5B-only; use the same-named demo WAV if present
+            wav_sibling = os.path.splitext(voice_path)[0] + ".wav"
+            candidates = [wav_sibling, os.path.join(
+                os.path.dirname(os.path.dirname(voice_path)), os.path.basename(wav_sibling))]
+            voice_path = next((c for c in candidates if os.path.exists(c)), None)
+            if voice_path is None:
+                raise RuntimeError(
+                    f"Voice '{speaker_id}' has no reference WAV for the "
+                    "1.5B/Large model. Clone a voice from a WAV clip first."
+                )
+        inputs = proc(
+            text=[f"Speaker 1: {text}"], voice_samples=[[voice_path]],
+            padding=True, return_tensors="pt", return_attention_mask=True,
+        )
+        for k, v in inputs.items():
+            if hasattr(v, "to"):
+                inputs[k] = v.to(device)
+        outputs = mdl.generate(
+            **inputs, max_new_tokens=None, cfg_scale=cfg_scale,
+            tokenizer=proc.tokenizer, generation_config={"do_sample": False},
+            verbose=False,
+        )
+        audio = outputs.speech_outputs[0]
+        if audio is None:
+            raise RuntimeError("No audio generated (input may be too short).")
+        return audio.float().cpu().numpy().reshape(-1)
+
+    # 0.5B streaming: pre-computed .pt cached-prompt voices only
     if not voice_path.endswith(".pt"):
         # Raw wav — 0.5B cannot truly condition on arbitrary audio;
         # fall back to default .pt voice and log a warning.
         log.warning(
             "AUDIO-03: 0.5B model cannot condition on raw WAV %s; "
-            "using in-Samuel_man.pt. Upgrade to 1.5B fork for true cloning.",
+            "using in-Samuel_man.pt. Set VIBEVOICE_MODEL=1.5B for true cloning.",
             voice_path,
         )
         voice_path = voice_store.get_voice_path("in-Samuel_man")

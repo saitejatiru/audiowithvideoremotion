@@ -43,6 +43,18 @@ def build_ui():
                             value="16:9",
                             label="Video Format (YouTube vs Reels/Shorts)"
                         )
+                        with gr.Row():
+                            subject_dropdown = gr.Dropdown(
+                                choices=["Auto-detect", "Mathematics", "Physics",
+                                         "Chemistry", "Biology", "Other"],
+                                value="Auto-detect",
+                                label="Subject"
+                            )
+                            grade_dropdown = gr.Dropdown(
+                                choices=["Auto-detect", "10", "11", "12"],
+                                value="Auto-detect",
+                                label="Grade / Class"
+                            )
                         backend_url = gr.Textbox(
                             label="Colab TTS Backend URL (Optional)",
                             value=DEFAULT_BACKEND,
@@ -57,7 +69,8 @@ def build_ui():
                 # Connect the generator function to the UI button
                 generate_btn.click(
                     fn=orchestrate_video,
-                    inputs=[script_input, voice_dropdown, backend_url, format_radio],
+                    inputs=[script_input, voice_dropdown, backend_url, format_radio,
+                            subject_dropdown, grade_dropdown],
                     outputs=[status_output, video_output],
                 )
 

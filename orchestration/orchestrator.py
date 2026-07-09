@@ -49,7 +49,14 @@ def _run_tts_with_retry(text: str, voice: str, backend_url: str) -> tuple:
     return 24000, run_vibevoice(text, voice)
 
 
-def orchestrate_video(script: str, voice: str, backend_url: str, video_format: str = "16:9"):
+def orchestrate_video(
+    script: str,
+    voice: str,
+    backend_url: str,
+    video_format: str = "16:9",
+    subject: str = "Auto-detect",
+    grade: str = "Auto-detect",
+):
     """Generator that runs the full pipeline and yields progress updates.
 
     Yields:
@@ -112,11 +119,19 @@ def orchestrate_video(script: str, voice: str, backend_url: str, video_format: s
             with open(timeline_path, "r", encoding="utf-8") as f:
                 t_data = json.load(f)
             # We don't retry LLM here, the storyboard pipeline handles its own repairs.
-            storyboard_pipeline(t_data)
+            storyboard_pipeline(t_data, subject=subject, grade=grade)
         except Exception as e:
             logger.error("Storyboard failed: %s", traceback.format_exc())
             yield f"Error: Storyboard generation failed — {e}", None
             return
+
+        # Fetch labeled diagrams for 'diagram' scenes (per-scene downgrades
+        # inside; belt-and-suspenders try so it can never kill the pipeline)
+        try:
+            from storyboard.assets import fetch_diagrams
+            fetch_diagrams(t_data, run_dir)
+        except Exception:
+            logger.warning("Diagram fetch skipped: %s", traceback.format_exc())
 
         # Inject user-selected format + raw→spoken word map into timeline meta
         t_data.setdefault("meta", {})["format"] = video_format

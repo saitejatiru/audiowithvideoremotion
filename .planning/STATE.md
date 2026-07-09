@@ -88,6 +88,14 @@ Recent decisions affecting current work:
 - Seam fix (06): storyboard_pipeline receives the timeline DICT (was passed a str path → TypeError on every run)
 - Seam fix (04): render_bridge wraps props as {"timeline": ...} (--props merges flat; calculateMetadata reads props.timeline) and copies narration into video/public/ (staticFile can't reach temp dirs)
 - Seam fix (04): npx.cmd on Windows; durationInFrames uses Math.ceil per VIDEO-03 (was Math.round)
+- Model (v1.1): VIBEVOICE_MODEL env selects 0.5B (streaming, .pt voices) / 1.5B (voice cloning from WAV, free T4) / Large ("7B", needs Colab Pro A100-L4). 1.5B+ requires vibevoice-community fork; notebook clones the right repo per choice
+- Voice (v1.1): energetic voice = clone from an energetic reference clip via 1.5B (Clone Voice tab); .pt voices auto-map to sibling demo WAV when a non-streaming model is active
+- Storyboard (v1.1): LLMSceneItem gained title/bullets/emoji + big-number/comparison types — all defaulted so old outputs and the bullet fallback still validate
+- Video (v1.1): SceneRenderer rebuilt as per-scene Sequences with spring entrances, staggered bullet reveals, 5 templates; CaptionRenderer rebuilt as TikTok-style pages (≤4 words/1.2s) with stroke text + active-word pop; scenes keep 220px clear of captions
+- Tier1 (v1.2): 4 new scene types — chart (animated bars), steps (numbered flow), formula (KaTeX, try/catch → plain text on bad LaTeX), diagram (real labeled diagrams from Wikimedia Commons w/ license credit; every failure downgrades the scene, never crashes)
+- Tier1 (v1.2): subject/grade audience control — Auto-detect default (LLM infers from script), manual dropdowns in UI; plumbed app.py → orchestrator → storyboard prompt
+- Tier1 (v1.2): NO AI-generated diagrams — correctness is the product for board-exam content; Commons only
+- Tier1 (v1.2): schema downgrade validators — malformed chart (<2 points), steps (<2 stages), empty formula degrade to 'bullet' inside Pydantic, so repair/fallback path stays intact
 
 ### Pending Todos
 

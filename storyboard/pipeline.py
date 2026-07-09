@@ -42,6 +42,11 @@ def inject_timing(
             end=sent["end"],
             onScreenText=item.on_screen_text,
             visual={"type": item.visual_type, "query": item.visual_query},
+            title=item.title,
+            bullets=item.bullets,
+            emoji=item.emoji,
+            chart={"labels": item.chart_labels, "values": item.chart_values},
+            formula=item.formula,
         )
         result.append(scene.model_dump())
     return result
@@ -54,6 +59,8 @@ def storyboard_pipeline(
     api_key: str | None = None,
     model: str | None = None,
     output_path: str | None = None,
+    subject: str = "Auto-detect",
+    grade: str = "Auto-detect",
 ) -> dict:
     """Run the full storyboard generation pipeline.
 
@@ -79,7 +86,7 @@ def storyboard_pipeline(
         return timeline
 
     # Build prompts
-    system_prompt = build_system_prompt()
+    system_prompt = build_system_prompt(subject=subject, grade=grade)
     user_prompt = build_user_prompt(sentences)
     messages = [
         {"role": "system", "content": system_prompt},
