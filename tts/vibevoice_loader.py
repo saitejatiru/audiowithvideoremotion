@@ -46,7 +46,14 @@ def load():
     import torch
 
     _device = "cuda" if torch.cuda.is_available() else "cpu"
-    dtype = torch.bfloat16 if _device == "cuda" else torch.float32
+    # bf16 on CPU too: halves RAM vs float32 — free Colab has ~12.7GB and the
+    # kernel OOM-kills a float32 1.5B load ("^C" at Loading checkpoint shards)
+    dtype = torch.bfloat16
+    if _device == "cpu":
+        log.warning(
+            "No GPU detected — model %s will load on CPU (slow, may exhaust RAM). "
+            "On Colab: Runtime -> Change runtime type -> T4 GPU.", MODEL_SIZE,
+        )
     log.info("Loading %s (%s) on %s (first call is slow)", MODEL_PATH, MODEL_SIZE, _device)
 
     if is_streaming():
@@ -67,15 +74,18 @@ def load():
         ddpm_steps = 10
 
     _processor = _Processor.from_pretrained(MODEL_PATH)
+    # low_cpu_mem_usage: stream shards instead of double-allocating in RAM
     try:
         _model = _Model.from_pretrained(
             MODEL_PATH, torch_dtype=dtype, device_map=_device,
+            low_cpu_mem_usage=True,
             attn_implementation="flash_attention_2" if _device == "cuda" else "sdpa",
         )
     except Exception:
         # flash-attn not installed — sdpa works everywhere
         _model = _Model.from_pretrained(
             MODEL_PATH, torch_dtype=dtype, device_map=_device,
+            low_cpu_mem_usage=True,
             attn_implementation="sdpa",
         )
     _model.eval()
