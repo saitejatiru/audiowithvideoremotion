@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.tox/
+.venv/
+venv/
+env/
+
+# Node / Remotion
+node_modules/
+dist/
+out/
+.remotion/
+
+# Local assets & configs
+voices/test-clone-voice.wav
+
+# Nested clones
+VibeVoice/

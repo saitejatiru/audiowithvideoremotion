@@ -1,0 +1,23 @@
+{
+  "name": "explainer-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remotion-based explainer video renderer — reads timeline.json, renders synced MP4",
+  "scripts": {
+    "dev": "npx remotion studio",
+    "build": "npx remotion render ExplainerVideo out/video.mp4",
+    "render": "npx remotion render ExplainerVideo"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.267",
+    "@remotion/bundler": "4.0.267",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "4.0.267"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.7.0"
+  }
+}

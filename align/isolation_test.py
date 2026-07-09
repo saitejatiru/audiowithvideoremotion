@@ -41,88 +41,93 @@ SPOKEN_TEXT = (
 OUTPUT_KNOWN_GOOD = "/tmp/timeline_known_good.json"
 OUTPUT_FALLBACK   = "/tmp/timeline_fallback.json"
 
-# ── guards ─────────────────────────────────────────────────────────────────────
+# ── execution ──────────────────────────────────────────────────────────────────
 
-if not WAV_PATH:
-    print("ERROR: TEST_CLIP_PATH env var not set. Set it to a 5-30s English speech WAV.")
-    print("  export TEST_CLIP_PATH='/path/to/clip.wav'")
-    sys.exit(1)
+def main():
+    if not WAV_PATH:
+        print("ERROR: TEST_CLIP_PATH env var not set. Set it to a 5-30s English speech WAV.")
+        print("  export TEST_CLIP_PATH='/path/to/clip.wav'")
+        sys.exit(1)
 
-if not os.path.exists(WAV_PATH):
-    print(f"ERROR: TEST_CLIP_PATH={WAV_PATH!r} does not exist.")
-    sys.exit(1)
+    if not os.path.exists(WAV_PATH):
+        print(f"ERROR: TEST_CLIP_PATH={WAV_PATH!r} does not exist.")
+        sys.exit(1)
 
-# ── test 1: known-good clip (primary path) ─────────────────────────────────────
+    # ── test 1: known-good clip (primary path) ─────────────────────────────────────
 
-print("=" * 60)
-print("ISOLATION TEST 1: KNOWN-GOOD CLIP (primary path)")
-print("=" * 60)
+    print("=" * 60)
+    print("ISOLATION TEST 1: KNOWN-GOOD CLIP (primary path)")
+    print("=" * 60)
 
-from align.align_pipeline import run_alignment, AlignmentDriftError
+    from align.align_pipeline import run_alignment, AlignmentDriftError
 
-try:
-    tl = run_alignment(WAV_PATH, SPOKEN_TEXT, output_path=OUTPUT_KNOWN_GOOD)
-except AlignmentDriftError as e:
-    print(f"WARN: AlignmentDriftError raised (WER={e.wer_score:.3f}). Retrying with fallback.")
-    tl = run_alignment(WAV_PATH, SPOKEN_TEXT, output_path=OUTPUT_KNOWN_GOOD, use_fallback=True)
+    try:
+        tl = run_alignment(WAV_PATH, SPOKEN_TEXT, output_path=OUTPUT_KNOWN_GOOD)
+    except AlignmentDriftError as e:
+        print(f"WARN: AlignmentDriftError raised (WER={e.wer_score:.3f}). Retrying with fallback.")
+        tl = run_alignment(WAV_PATH, SPOKEN_TEXT, output_path=OUTPUT_KNOWN_GOOD, use_fallback=True)
 
-print(f"WER:          {tl['meta']['wer']}")
-print(f"alignMethod:  {tl['meta']['alignMethod']}")
-print(f"durationSec:  {tl['audio']['durationSec']}")
-print(f"Word count:   {len(tl['words'])}")
-print(f"Sentence cnt: {len(tl['sentences'])}")
-print("First 3 words:")
-for w in tl["words"][:3]:
-    print(f"  {w}")
+    print(f"WER:          {tl['meta']['wer']}")
+    print(f"alignMethod:  {tl['meta']['alignMethod']}")
+    print(f"durationSec:  {tl['audio']['durationSec']}")
+    print(f"Word count:   {len(tl['words'])}")
+    print(f"Sentence cnt: {len(tl['sentences'])}")
+    print("First 3 words:")
+    for w in tl["words"][:3]:
+        print(f"  {w}")
 
-# Assertions
-assert tl["meta"]["alignMethod"] == "whisperx-forced", (
-    f"Expected whisperx-forced, got {tl['meta']['alignMethod']!r}"
-)
-assert tl["meta"]["wer"] < 0.08, (
-    f"WER {tl['meta']['wer']:.4f} exceeds threshold 0.08 — clip may be mismatched"
-)
-assert tl["audio"]["durationSec"] > tl["words"][-1]["end"], (
-    "durationSec must exceed last word end (trailing silence)"
-)
-assert {"audio", "words", "sentences", "meta"}.issubset(tl.keys())
-print("KNOWN-GOOD: PASS")
+    # Assertions
+    assert tl["meta"]["alignMethod"] == "whisperx-forced", (
+        f"Expected whisperx-forced, got {tl['meta']['alignMethod']!r}"
+    )
+    assert tl["meta"]["wer"] < 0.08, (
+        f"WER {tl['meta']['wer']:.4f} exceeds threshold 0.08 — clip may be mismatched"
+    )
+    assert tl["audio"]["durationSec"] > tl["words"][-1]["end"], (
+        "durationSec must exceed last word end (trailing silence)"
+    )
+    assert {"audio", "words", "sentences", "meta"}.issubset(tl.keys())
+    print("KNOWN-GOOD: PASS")
 
-# ── test 2: fallback path ──────────────────────────────────────────────────────
+    # ── test 2: fallback path ──────────────────────────────────────────────────────
 
-print()
-print("=" * 60)
-print("ISOLATION TEST 2: FALLBACK PATH (whisper-timestamped)")
-print("=" * 60)
+    print()
+    print("=" * 60)
+    print("ISOLATION TEST 2: FALLBACK PATH (whisper-timestamped)")
+    print("=" * 60)
 
-tl_fb = run_alignment(
-    WAV_PATH, "Hello world. This is a test.",
-    output_path=OUTPUT_FALLBACK,
-    use_fallback=True,
-)
+    tl_fb = run_alignment(
+        WAV_PATH, "Hello world. This is a test.",
+        output_path=OUTPUT_FALLBACK,
+        use_fallback=True,
+    )
 
-print(f"alignMethod:  {tl_fb['meta']['alignMethod']}")
-print(f"Word count:   {len(tl_fb['words'])}")
-print("First 3 words:")
-for w in tl_fb["words"][:3]:
-    print(f"  {w}")
+    print(f"alignMethod:  {tl_fb['meta']['alignMethod']}")
+    print(f"Word count:   {len(tl_fb['words'])}")
+    print("First 3 words:")
+    for w in tl_fb["words"][:3]:
+        print(f"  {w}")
 
-# Assertions
-assert tl_fb["meta"]["alignMethod"] == "whisper-timestamped-fallback", (
-    f"Expected whisper-timestamped-fallback, got {tl_fb['meta']['alignMethod']!r}"
-)
-required_keys = {"w", "start", "end", "speaker"}
-for w in tl_fb["words"]:
-    assert required_keys.issubset(w.keys()), f"Missing keys: {required_keys - w.keys()}"
-print("FALLBACK: PASS")
+    # Assertions
+    assert tl_fb["meta"]["alignMethod"] == "whisper-timestamped-fallback", (
+        f"Expected whisper-timestamped-fallback, got {tl_fb['meta']['alignMethod']!r}"
+    )
+    required_keys = {"w", "start", "end", "speaker"}
+    for w in tl_fb["words"]:
+        assert required_keys.issubset(w.keys()), f"Missing keys: {required_keys - w.keys()}"
+    print("FALLBACK: PASS")
 
-# ── summary ────────────────────────────────────────────────────────────────────
+    # ── summary ────────────────────────────────────────────────────────────────────
 
-print()
-print("=" * 60)
-print("PHASE 2 ISOLATION GATE: PASSED")
-print(f"Known-good WER:  {tl['meta']['wer']:.4f} (threshold 0.08)")
-print(f"Fallback method: {tl_fb['meta']['alignMethod']}")
-print(f"Outputs written: {OUTPUT_KNOWN_GOOD}, {OUTPUT_FALLBACK}")
-print("Phase 4 may begin.")
-print("=" * 60)
+    print()
+    print("=" * 60)
+    print("PHASE 2 ISOLATION GATE: PASSED")
+    print(f"Known-good WER:  {tl['meta']['wer']:.4f} (threshold 0.08)")
+    print(f"Fallback method: {tl_fb['meta']['alignMethod']}")
+    print(f"Outputs written: {OUTPUT_KNOWN_GOOD}, {OUTPUT_FALLBACK}")
+    print("Phase 4 may begin.")
+    print("=" * 60)
+
+
+if __name__ == "__main__":
+    main()
