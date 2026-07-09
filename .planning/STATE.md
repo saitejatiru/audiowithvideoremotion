@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 1 of 6 (Contracts & Text Prep)
-Plan: 1 of TBD in current phase
+Plan: 2 of TBD in current phase
 Status: In progress
-Last activity: 2026-07-09 — Plan 01-01 complete: 14 RED test stubs for INFRA-01, AUDIO-01..05
+Last activity: 2026-07-09 — Plan 01-02 complete: normalizer.py + schema.py (AUDIO-04, timeline contract)
 
-Progress: [█░░░░░░░░░] ~5%
+Progress: [██░░░░░░░░] ~10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4 min
-- Total execution time: 0.07 hours
+- Total plans completed: 2
+- Average duration: 3 min
+- Total execution time: 0.10 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-contracts-text-prep | 1 | 4 min | 4 min |
+| 01-contracts-text-prep | 2 | 6 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min
-- Trend: baseline
+- Last 5 plans: 4 min, 2 min
+- Trend: fast
 
 *Updated after each plan completion*
 
@@ -50,6 +50,8 @@ Recent decisions affecting current work:
 - TDD RED pattern (01-01): imports deferred into test bodies so --collect-only works on Windows without ImportError
 - TDD RED pattern (01-01): stdlib struct used for WAV fixture — no soundfile dep in RED state
 - TDD RED pattern (01-01): pytestmark skipif(Windows) on test_normalizer.py (pynini unavailable on Windows)
+- Schema (01-02): write_phase1_timeline() derives durationSec via soundfile.info() internally — invariant enforced in code, not docs
+- Normalizer (01-02): NeMo import guarded; returns (raw_text, []) on Windows; Phase 2 spoken-form contract documented in module docstring
 
 ### Pending Todos
 
@@ -63,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed 01-01-PLAN.md — 14 RED test stubs committed (af6c262)
+Stopped at: Completed 01-02-PLAN.md — normalizer.py + schema.py committed (9fccdc9, 6e77245)
 Resume file: None
