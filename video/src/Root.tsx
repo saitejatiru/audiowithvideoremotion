@@ -46,17 +46,21 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="ExplainerVideo"
         component={ExplainerVideo as any}
-        width={WIDTH}
-        height={HEIGHT}
-        fps={FPS}
         defaultProps={{ timeline: defaultTimeline }}
-        calculateMetadata={async ({ props }) => {
+        calculateMetadata={({ props }) => {
           const timeline = (props as any).timeline as Timeline;
-          // VIDEO-03: duration from actual audio, never hardcoded
-          const durationInFrames = Math.ceil(
-            timeline.audio.durationSec * FPS
-          );
-          return { durationInFrames };
+          const isReel = timeline.meta?.format === "9:16";
+          const width = isReel ? 1080 : 1920;
+          const height = isReel ? 1920 : 1080;
+          return {
+            width,
+            height,
+            fps: FPS,
+            durationInFrames: Math.max(
+              1,
+              Math.round(timeline.audio.durationSec * FPS)
+            ),
+          };
         }}
       />
     </>

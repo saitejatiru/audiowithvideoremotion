@@ -46,6 +46,7 @@ export interface TimelineMeta {
   lang: string;
   wer?: number;
   generator: string;
+  format?: string; // e.g. "16:9" or "9:16"
   alignMethod?: string;
   alignedAt?: string;
 }

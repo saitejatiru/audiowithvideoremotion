@@ -38,6 +38,11 @@ def build_ui():
                             value=default_voice,
                             label="Voice Identity"
                         )
+                        format_radio = gr.Radio(
+                            choices=["16:9", "9:16"],
+                            value="16:9",
+                            label="Video Format (YouTube vs Reels/Shorts)"
+                        )
                         backend_url = gr.Textbox(
                             label="Colab TTS Backend URL (Optional)",
                             value=DEFAULT_BACKEND,
@@ -52,7 +57,7 @@ def build_ui():
                 # Connect the generator function to the UI button
                 generate_btn.click(
                     fn=orchestrate_video,
-                    inputs=[script_input, voice_dropdown, backend_url],
+                    inputs=[script_input, voice_dropdown, backend_url, format_radio],
                     outputs=[status_output, video_output],
                 )
 

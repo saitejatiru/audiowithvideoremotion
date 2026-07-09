@@ -33,7 +33,7 @@ def _run_tts_with_retry(text: str, voice: str, backend_url: str) -> tuple:
     return run_vibevoice(text, voice, backend_url)
 
 
-def orchestrate_video(script: str, voice: str, backend_url: str):
+def orchestrate_video(script: str, voice: str, backend_url: str, video_format: str = "16:9"):
     """Generator that runs the full pipeline and yields progress updates.
 
     Yields:
@@ -91,6 +91,16 @@ def orchestrate_video(script: str, voice: str, backend_url: str):
             logger.error("Storyboard failed: %s", traceback.format_exc())
             yield f"Error: Storyboard generation failed — {e}", None
             return
+            
+        # Inject the user-selected video format into the timeline meta
+        import json
+        with open(timeline_path, "r", encoding="utf-8") as f:
+            t_data = json.load(f)
+        if "meta" not in t_data:
+            t_data["meta"] = {}
+        t_data["meta"]["format"] = video_format
+        with open(timeline_path, "w", encoding="utf-8") as f:
+            json.dump(t_data, f, indent=2)
 
         # Step 4: Render
         yield "Step 4/5: Rendering video with Remotion...", None
