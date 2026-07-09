@@ -111,8 +111,11 @@ Plans:
   1. User enters a script into the Gradio page, picks a voice, clicks Generate, and receives a previewable and downloadable finished video without any CLI interaction
   2. If a pipeline stage fails transiently (Colab session timeout, network error), the orchestrator retries that stage automatically before surfacing an error to the user
   3. The orchestrator runs all pipeline stages in the correct sequence with a single trigger and surfaces a clear error message if a stage fails after retries
-**Plans**: TBD
+**Plans**: 2 plans
 
+Plans:
+- [x] 06-01-PLAN.md — Pipeline Orchestrator: generator function tying all phases together
+- [x] 06-02-PLAN.md — Gradio UI: end-to-end interface wrapping the orchestrator
 ## Progress
 
 **Execution Order:**
@@ -125,4 +128,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Storyboard | 4/4 | Code complete — LLM test needs API key | 2026-07-09 |
 | 4. Remotion Render | 3/3 | Code complete — needs Colab headless test | 2026-07-09 |
 | 5. Post-processing | 1/1 | Code complete — needs Colab ffmpeg test | 2026-07-09 |
-| 6. Platform | 0/TBD | Not started | - |
+| 6. Platform | 2/2 | Complete | 2026-07-09 |
