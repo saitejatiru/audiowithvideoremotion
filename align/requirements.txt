@@ -1,0 +1,8 @@
+# torch/torchaudio: pre-installed on Colab — do not add here
+whisperx==3.8.6
+jiwer==4.0.0
+whisper-normalizer==0.1.12
+whisper-timestamped==1.15.9
+librosa
+soundfile
+pytest
