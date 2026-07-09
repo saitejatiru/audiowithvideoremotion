@@ -8,7 +8,9 @@ This module is consumed by Phase 6's orchestrator.
 import json
 import logging
 import os
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -56,13 +58,30 @@ def render_video(
         timeline = json.load(f)
     expected_duration = timeline.get("audio", {}).get("durationSec", 0)
 
-    # Build the render command
-    # --props takes a file path; Remotion reads it as inputProps
+    # staticFile() only resolves inside video/public/ — copy the narration
+    # there and rewrite audio.path to the bare filename.
+    audio_src = timeline.get("audio", {}).get("path", "")
+    if audio_src and not os.path.isabs(audio_src):
+        audio_src = os.path.join(os.path.dirname(timeline_path), audio_src)
+    if audio_src and os.path.exists(audio_src):
+        public_dir = project_dir / "public"
+        public_dir.mkdir(exist_ok=True)
+        audio_name = "narration-" + Path(output_path).stem + ".wav"
+        shutil.copy2(audio_src, public_dir / audio_name)
+        timeline["audio"]["path"] = audio_name
+
+    # The composition expects props of shape {timeline: ...}; --props merges
+    # the JSON file at top level, so wrap before passing.
+    props_fd, props_path = tempfile.mkstemp(suffix=".json")
+    with os.fdopen(props_fd, "w", encoding="utf-8") as f:
+        json.dump({"timeline": timeline}, f)
+
+    npx = "npx.cmd" if os.name == "nt" else "npx"
     cmd = [
-        "npx", "remotion", "render",
+        npx, "remotion", "render",
         composition_id,
         output_path,
-        "--props", timeline_path,
+        "--props", props_path,
     ]
 
     logger.info("Rendering video: %s", " ".join(cmd))
@@ -81,6 +100,8 @@ def render_video(
         raise RenderError(
             "npx not found — ensure Node.js is installed and in PATH"
         )
+    finally:
+        os.unlink(props_path)
 
     if result.returncode != 0:
         logger.error("Remotion stderr: %s", result.stderr)

@@ -24,6 +24,7 @@ def sample_timeline_file(tmp_path):
     }
     path = tmp_path / "timeline.json"
     path.write_text(json.dumps(timeline), encoding="utf-8")
+    (tmp_path / "audio.wav").write_bytes(b"RIFF")  # audio.path resolves next to timeline
     return str(path)
 
 
@@ -41,12 +42,12 @@ class TestRenderVideo:
         with patch("render.render_bridge.subprocess.run", return_value=mock_result) as mock_run, \
              patch("render.render_bridge.os.path.exists", side_effect=lambda p: True), \
              patch("render.render_bridge._get_video_duration", return_value=6.0):
-            render_video(sample_timeline_file, output)
+            render_video(sample_timeline_file, output, video_dir=str(tmp_path))
 
         # Verify subprocess was called
         mock_run.assert_called_once()
         cmd = mock_run.call_args[0][0]
-        assert cmd[0] == "npx"
+        assert cmd[0] in ("npx", "npx.cmd")
         assert cmd[1] == "remotion"
         assert cmd[2] == "render"
         assert cmd[3] == "ExplainerVideo"
@@ -67,7 +68,7 @@ class TestRenderVideo:
 
         with patch("render.render_bridge.subprocess.run", return_value=mock_result):
             with pytest.raises(RenderError, match="Remotion render failed"):
-                render_video(sample_timeline_file, output)
+                render_video(sample_timeline_file, output, video_dir=str(tmp_path))
 
     def test_raises_on_timeout(self, sample_timeline_file, tmp_path):
         """RenderError when subprocess times out."""
@@ -76,7 +77,7 @@ class TestRenderVideo:
 
         with patch("render.render_bridge.subprocess.run", side_effect=sp.TimeoutExpired("cmd", 600)):
             with pytest.raises(RenderError, match="timed out"):
-                render_video(sample_timeline_file, output)
+                render_video(sample_timeline_file, output, video_dir=str(tmp_path))
 
     def test_raises_on_missing_output(self, sample_timeline_file, tmp_path):
         """RenderError when render exits 0 but no file produced."""
@@ -106,7 +107,7 @@ class TestRenderVideo:
         with patch("render.render_bridge.subprocess.run", return_value=mock_result) as mock_run, \
              patch("render.render_bridge.os.path.exists", return_value=True), \
              patch("render.render_bridge._get_video_duration", return_value=6.0):
-            render_video(sample_timeline_file, output, composition_id="CustomComp")
+            render_video(sample_timeline_file, output, composition_id="CustomComp", video_dir=str(tmp_path))
 
         cmd = mock_run.call_args[0][0]
         assert "CustomComp" in cmd

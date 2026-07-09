@@ -5,6 +5,7 @@ TTS -> Align -> Storyboard -> Render -> Post-process
 
 Handles transient failures via tenacity and yields progress updates for Gradio.
 """
+import json
 import os
 import tempfile
 import traceback
@@ -13,6 +14,7 @@ import logging
 import soundfile as sf
 from tenacity import retry, stop_after_attempt, wait_exponential
 
+from tts.normalizer import normalize
 from tts.server import run_vibevoice
 from align.align_pipeline import run_alignment, AlignmentDriftError
 from storyboard.pipeline import storyboard_pipeline
@@ -29,8 +31,22 @@ class OrchestratorError(Exception):
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10), reraise=True)
 def _run_tts_with_retry(text: str, voice: str, backend_url: str) -> tuple:
-    """Run TTS with exponential backoff for transient HTTP errors."""
-    return run_vibevoice(text, voice, backend_url)
+    """Return (sample_rate, audio_data). Uses the Colab HTTP endpoint when
+    backend_url is set (INFRA-01 contract), else the local model."""
+    if backend_url:
+        import io
+        import requests
+
+        resp = requests.post(
+            backend_url.rstrip("/") + "/synthesize",
+            json={"text": text, "speaker_id": voice},
+            headers={"Authorization": "Bearer " + os.environ.get("API_SECRET", "")},
+            timeout=600,
+        )
+        resp.raise_for_status()
+        audio_data, sample_rate = sf.read(io.BytesIO(resp.content))
+        return sample_rate, audio_data
+    return 24000, run_vibevoice(text, voice)
 
 
 def orchestrate_video(script: str, voice: str, backend_url: str, video_format: str = "16:9"):
@@ -42,6 +58,14 @@ def orchestrate_video(script: str, voice: str, backend_url: str, video_format: s
     script = script.strip()
     if not script:
         yield "Error: Script is empty.", None
+        return
+
+    # AUDIO-04: expand numbers/symbols before TTS; spoken form feeds both
+    # synthesis and forced alignment, word_map keeps raw text for captions.
+    try:
+        spoken, word_map = normalize(script)
+    except ValueError as e:
+        yield f"Error: {e}", None
         return
 
     # Create a unique temporary directory for this run's artifacts
@@ -57,7 +81,7 @@ def orchestrate_video(script: str, voice: str, backend_url: str, video_format: s
         # Step 1: TTS
         yield "Step 1/5: Generating audio (TTS)...", None
         try:
-            sample_rate, audio_data = _run_tts_with_retry(script, voice, backend_url)
+            sample_rate, audio_data = _run_tts_with_retry(spoken, voice, backend_url)
         except Exception as e:
             logger.error("TTS failed: %s", traceback.format_exc())
             yield f"Error: TTS failed after retries — {e}", None
@@ -68,12 +92,12 @@ def orchestrate_video(script: str, voice: str, backend_url: str, video_format: s
         # Step 2: Align
         yield "Step 2/5: Aligning audio with script...", None
         try:
-            run_alignment(audio_path, script, timeline_path)
+            run_alignment(audio_path, spoken, timeline_path)
         except AlignmentDriftError as e:
             logger.warning("Alignment drift detected (WER=%f). Retrying with fallback.", e.wer_score)
             yield "Step 2/5: Alignment drift detected. Retrying with robust fallback...", None
             try:
-                run_alignment(audio_path, script, timeline_path, use_fallback=True)
+                run_alignment(audio_path, spoken, timeline_path, use_fallback=True)
             except Exception as e2:
                 yield f"Error: Alignment fallback failed — {e2}", None
                 return
@@ -85,20 +109,19 @@ def orchestrate_video(script: str, voice: str, backend_url: str, video_format: s
         # Step 3: Storyboard
         yield "Step 3/5: Generating storyboard (LLM)...", None
         try:
+            with open(timeline_path, "r", encoding="utf-8") as f:
+                t_data = json.load(f)
             # We don't retry LLM here, the storyboard pipeline handles its own repairs.
-            storyboard_pipeline(timeline_path, timeline_path)
+            storyboard_pipeline(t_data)
         except Exception as e:
             logger.error("Storyboard failed: %s", traceback.format_exc())
             yield f"Error: Storyboard generation failed — {e}", None
             return
-            
-        # Inject the user-selected video format into the timeline meta
-        import json
-        with open(timeline_path, "r", encoding="utf-8") as f:
-            t_data = json.load(f)
-        if "meta" not in t_data:
-            t_data["meta"] = {}
-        t_data["meta"]["format"] = video_format
+
+        # Inject user-selected format + raw→spoken word map into timeline meta
+        t_data.setdefault("meta", {})["format"] = video_format
+        if word_map:
+            t_data["meta"]["wordMap"] = word_map
         with open(timeline_path, "w", encoding="utf-8") as f:
             json.dump(t_data, f, indent=2)
 

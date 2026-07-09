@@ -58,7 +58,7 @@ export const RemotionRoot: React.FC = () => {
             fps: FPS,
             durationInFrames: Math.max(
               1,
-              Math.round(timeline.audio.durationSec * FPS)
+              Math.ceil(timeline.audio.durationSec * FPS)
             ),
           };
         }}

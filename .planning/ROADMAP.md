@@ -17,11 +17,11 @@ capability and must be verified in isolation before any video work begins.
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Contracts & Text Prep** - GPU HTTP endpoint live, script normalizer running, timeline.json schema defined, default voice persisted (completed 2026-07-09)
-- [ ] **Phase 2: Alignment Engine** - Word-level timestamps from forced alignment, ASR-WER guard, timeline.json emitted
+- [x] **Phase 2: Alignment Engine** - Word-level timestamps from forced alignment, ASR-WER guard, timeline.json emitted (code complete 2026-07-09 — Colab isolation gate pending)
 - [x] **Phase 3: Storyboard** - LLM generates schema-validated scene content per sentence (completed 2026-07-09)
 - [x] **Phase 4: Remotion Render** - Video synced to audio with word-level captions and correct duration (completed 2026-07-09)
 - [x] **Phase 5: Post-processing** - Metadata stripped, output web-ready (completed 2026-07-09)
-- [ ] **Phase 6: Platform** - Gradio UI + orchestrator runs the full pipeline end-to-end
+- [x] **Phase 6: Platform** - Gradio UI + orchestrator runs the full pipeline end-to-end (completed 2026-07-09; orchestrator seams fixed same day)
 
 ## Phase Details
 

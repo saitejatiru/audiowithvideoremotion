@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 
 Phase: 6 of 6 (Platform)
 Plan: 2 of 2 in current phase
-Status: Phase 6 code complete — Gradio UI and pipeline orchestrator
-Last activity: 2026-07-09 — Plan 06-02 complete: app.py Gradio UI wrapper for the full pipeline
+Status: All 6 phases code complete — orchestrator/render integration seams fixed; Colab E2E verification pending
+Last activity: 2026-07-09 — Fixed 5 integration bugs found in post-Antigravity review (see Decisions below)
 
 Progress: [████████████] 100%
 
@@ -83,6 +83,11 @@ Recent decisions affecting current work:
 - Render (04-03): render_bridge.py spawns subprocess for npx remotion render and checks output duration using ffprobe
 - Post (05-01): post_processor.py executes ffmpeg subprocess to copy streams while stripping metadata and adding faststart
 - Post (05-01): verify_metadata_stripped() uses ffprobe JSON parser to verify container tags are empty
+- Seam fix (06): _run_tts_with_retry now honors backend_url — POSTs to Colab /synthesize when set, local run_vibevoice otherwise (INFRA-01 was silently bypassed)
+- Seam fix (06): orchestrator calls normalize() before TTS/align — spoken text feeds both, word_map stored in timeline meta.wordMap (AUDIO-04 was never wired in)
+- Seam fix (06): storyboard_pipeline receives the timeline DICT (was passed a str path → TypeError on every run)
+- Seam fix (04): render_bridge wraps props as {"timeline": ...} (--props merges flat; calculateMetadata reads props.timeline) and copies narration into video/public/ (staticFile can't reach temp dirs)
+- Seam fix (04): npx.cmd on Windows; durationInFrames uses Math.ceil per VIDEO-03 (was Math.round)
 
 ### Pending Todos
 
@@ -96,5 +101,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed Phase 5 — post_processor.py metadata stripper + 7 tests passed
+Stopped at: Post-Antigravity integration review — 5 seam bugs fixed in orchestration/, render/, video/; tests updated to write real timeline fixtures instead of mocking past the seams
 Resume file: None

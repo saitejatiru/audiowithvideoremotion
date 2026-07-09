@@ -49,22 +49,13 @@ def run_vibevoice(text: str, speaker_id: str, cfg_scale: float = 1.5):
     """
     import copy
     import torch
-    import numpy as np
+
+    from tts.vibevoice_loader import load
 
     voice_path = voice_store.get_voice_path(speaker_id)
+    mdl, proc, device = load()
 
-    try:
-        from VibeVoice.app import _load_local, _processor, _model  # type: ignore
-    except ModuleNotFoundError:
-        try:
-            from VibeVoice.demo.web.app import _load_local, _processor, _model  # type: ignore
-        except ModuleNotFoundError:
-            raise RuntimeError("Could not locate VibeVoice app.py in either VibeVoice.app or VibeVoice.demo.web.app")
-    _load_local()
-
-    if voice_path.endswith(".pt"):
-        cached = torch.load(voice_path, map_location="cpu", weights_only=False)
-    else:
+    if not voice_path.endswith(".pt"):
         # Raw wav — 0.5B cannot truly condition on arbitrary audio;
         # fall back to default .pt voice and log a warning.
         log.warning(
@@ -72,14 +63,17 @@ def run_vibevoice(text: str, speaker_id: str, cfg_scale: float = 1.5):
             "using in-Samuel_man.pt. Upgrade to 1.5B fork for true cloning.",
             voice_path,
         )
-        from VibeVoice.app import VOICES  # type: ignore
-        cached = torch.load(VOICES["in-Samuel_man"], map_location="cpu", weights_only=False)
+        voice_path = voice_store.get_voice_path("in-Samuel_man")
+    # ponytail: trusted repo files hold a ModelOutput, not plain tensors -> weights_only=False
+    cached = torch.load(voice_path, map_location=device, weights_only=False)
 
-    from VibeVoice.app import _processor as proc, _model as mdl  # type: ignore
     inputs = proc.process_input_with_cached_prompt(
         text=text, cached_prompt=cached, padding=True,
         return_tensors="pt", return_attention_mask=True,
     )
+    for k, v in inputs.items():
+        if hasattr(v, "to"):
+            inputs[k] = v.to(device)
     outputs = mdl.generate(
         **inputs, max_new_tokens=None, cfg_scale=cfg_scale,
         tokenizer=proc.tokenizer, generation_config={"do_sample": False},

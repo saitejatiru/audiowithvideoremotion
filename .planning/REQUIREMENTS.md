@@ -22,26 +22,26 @@
 
 ### Storyboard (LLM)
 
-- [ ] **STORY-01**: LLM generates a per-sentence storyboard (visual, on-screen text, scene) from script + sentences
-- [ ] **STORY-02**: Storyboard output is schema-validated JSON with a repair/fallback path
-- [ ] **STORY-03**: Scene boundaries clamp to sentence boundaries (a scene never straddles a word)
+- [x] **STORY-01**: LLM generates a per-sentence storyboard (visual, on-screen text, scene) from script + sentences
+- [x] **STORY-02**: Storyboard output is schema-validated JSON with a repair/fallback path
+- [x] **STORY-03**: Scene boundaries clamp to sentence boundaries (a scene never straddles a word)
 
 ### Video (Remotion)
 
-- [ ] **VIDEO-01**: Remotion renders a video from `timeline.json`, synced to the narration audio
-- [ ] **VIDEO-02**: Word-level captions render in-video, timed to each word's start/end
-- [ ] **VIDEO-03**: Composition duration derives from actual audio length (no cutoff or drift)
-- [ ] **VIDEO-04**: Multi-speaker captions are visually distinguished when the audio has multiple speakers
+- [x] **VIDEO-01**: Remotion renders a video from `timeline.json`, synced to the narration audio
+- [x] **VIDEO-02**: Word-level captions render in-video, timed to each word's start/end
+- [x] **VIDEO-03**: Composition duration derives from actual audio length (no cutoff or drift)
+- [x] **VIDEO-04**: Multi-speaker captions are visually distinguished when the audio has multiple speakers
 
 ### Post-processing
 
-- [ ] **POST-01**: Output video metadata is stripped/de-fingerprinted (ffmpeg `-map_metadata -1`)
-- [ ] **POST-02**: Output stays web-playable (faststart) and plays correctly after stripping
+- [x] **POST-01**: Output video metadata is stripped/de-fingerprinted (ffmpeg `-map_metadata -1`)
+- [x] **POST-02**: Output stays web-playable (faststart) and plays correctly after stripping
 
 ### Platform
 
-- [ ] **PLAT-01**: Simple Gradio page — enter script, pick voice, generate, preview/download the video
-- [ ] **PLAT-02**: Orchestration runs the full multi-stage pipeline end-to-end with basic retry
+- [x] **PLAT-01**: Simple Gradio page — enter script, pick voice, generate, preview/download the video
+- [x] **PLAT-02**: Orchestration runs the full multi-stage pipeline end-to-end with basic retry
 
 ### Infrastructure
 
@@ -83,17 +83,19 @@
 | ALIGN-02 | Phase 2 | Complete |
 | ALIGN-03 | Phase 2 | Complete |
 | ALIGN-04 | Phase 2 | Complete |
-| STORY-01 | Phase 3 | Pending |
-| STORY-02 | Phase 3 | Pending |
-| STORY-03 | Phase 3 | Pending |
-| VIDEO-01 | Phase 4 | Pending |
-| VIDEO-02 | Phase 4 | Pending |
-| VIDEO-03 | Phase 4 | Pending |
-| VIDEO-04 | Phase 4 | Pending |
-| POST-01 | Phase 5 | Pending |
-| POST-02 | Phase 5 | Pending |
-| PLAT-01 | Phase 6 | Pending |
-| PLAT-02 | Phase 6 | Pending |
+| STORY-01 | Phase 3 | Complete (code) |
+| STORY-02 | Phase 3 | Complete (code) |
+| STORY-03 | Phase 3 | Complete (code) |
+| VIDEO-01 | Phase 4 | Complete (code) |
+| VIDEO-02 | Phase 4 | Complete (code) |
+| VIDEO-03 | Phase 4 | Complete (code) |
+| VIDEO-04 | Phase 4 | Complete (code) |
+| POST-01 | Phase 5 | Complete (code) |
+| POST-02 | Phase 5 | Complete (code) |
+| PLAT-01 | Phase 6 | Complete (code) |
+| PLAT-02 | Phase 6 | Complete (code) |
+
+*"Complete (code)" = implemented + unit-tested on Windows; Colab E2E verification pending (COLAB_CHECKLIST.md sections 4-5).*
 
 **Coverage:**
 - v1 requirements: 21 total (note: REQUIREMENTS.md header said 20; count corrected — 21 IDs present)

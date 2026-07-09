@@ -136,6 +136,42 @@ print("✅ STORY-02 fallback: PASSED — graceful degradation to bullet scenes")
 
 ---
 
+## 5. Full pipeline E2E — Phases 4-6 (after sections 3-4 pass)
+
+**5a. Setup (Node + ffmpeg + deps)**
+```python
+!apt-get -qq install -y ffmpeg
+!npm install --prefix video --silent          # Remotion deps (Node 20 preinstalled on Colab)
+!pip install -q openai json-repair tenacity gradio
+```
+
+**5b. One-shot script→video run — VIDEO-01/02/03, POST-01/02, PLAT-02**
+```python
+import os
+os.environ["LLM_API_KEY"] = "<your-deepseek-api-key>"   # from section 4
+
+from orchestration.orchestrator import orchestrate_video
+final = None
+for status, video in orchestrate_video(
+    "Machine learning helps computers learn patterns from data without explicit programming.",
+    "default", ""):
+    print(status)
+    if video: final = video
+assert final and final.endswith("final.mp4")
+```
+Verify on the output:
+- Video plays; captions appear word-by-word in sync with narration (VIDEO-01/02)
+- `!ffprobe -v quiet -print_format json -show_format {final}` → no custom tags (POST-01)
+- Duration matches audio length within a frame (VIDEO-03)
+
+**5c. Gradio UI — PLAT-01**
+```python
+os.environ["GRADIO_SHARE"] = "1"
+!python app.py    # open the share URL, generate a video from the browser
+```
+
+---
+
 ## What passing these unblocks
 
 | Result | Meaning |
@@ -144,5 +180,6 @@ print("✅ STORY-02 fallback: PASSED — graceful degradation to bullet scenes")
 | Section 3a prints "GATE: PASSED" | Phase 2 fully verified → **Phase 4 (Remotion) may begin** |
 | Section 4a prints "ALL PASSED" | Phase 3 fully verified — LLM integration confirmed |
 | Section 4b prints "fallback: PASSED" | Phase 3 resilience verified — pipeline crash-proof |
+| Section 5b produces a playable final.mp4 | Phases 4-6 verified — **the product works end-to-end** |
 
 Until 3a passes on Colab, Phase 4 stays BLOCKED by design — a wrong timeline makes every video frame wrong.
