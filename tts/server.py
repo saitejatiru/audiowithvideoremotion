@@ -53,8 +53,13 @@ def run_vibevoice(text: str, speaker_id: str, cfg_scale: float = 1.5):
 
     voice_path = voice_store.get_voice_path(speaker_id)
 
-    # Lazy-load model (mirrors VibeVoice/app.py _load_local pattern)
-    from VibeVoice.app import _load_local, _processor, _model  # type: ignore
+    try:
+        from VibeVoice.app import _load_local, _processor, _model  # type: ignore
+    except ModuleNotFoundError:
+        try:
+            from VibeVoice.demo.web.app import _load_local, _processor, _model  # type: ignore
+        except ModuleNotFoundError:
+            raise RuntimeError("Could not locate VibeVoice app.py in either VibeVoice.app or VibeVoice.demo.web.app")
     _load_local()
 
     if voice_path.endswith(".pt"):
