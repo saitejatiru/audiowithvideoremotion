@@ -16,7 +16,7 @@ capability and must be verified in isolation before any video work begins.
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Contracts & Text Prep** - GPU HTTP endpoint live, script normalizer running, timeline.json schema defined, default voice persisted
+- [x] **Phase 1: Contracts & Text Prep** - GPU HTTP endpoint live, script normalizer running, timeline.json schema defined, default voice persisted (completed 2026-07-09)
 - [ ] **Phase 2: Alignment Engine** - Word-level timestamps from forced alignment, ASR-WER guard, timeline.json emitted
 - [ ] **Phase 3: Storyboard** - LLM generates schema-validated scene content per sentence
 - [ ] **Phase 4: Remotion Render** - Video synced to audio with word-level captions and correct duration
@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Contracts & Text Prep | 2/3 | In Progress|  |
+| 1. Contracts & Text Prep | 3/3 | Complete   | 2026-07-09 |
 | 2. Alignment Engine | 0/TBD | Not started | - |
 | 3. Storyboard | 0/TBD | Not started | - |
 | 4. Remotion Render | 0/TBD | Not started | - |

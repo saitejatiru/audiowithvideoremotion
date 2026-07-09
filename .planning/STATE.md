@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 1 of 6 (Contracts & Text Prep)
-Plan: 2 of TBD in current phase
+Plan: 3 of 3 in current phase
 Status: In progress
-Last activity: 2026-07-09 — Plan 01-02 complete: normalizer.py + schema.py (AUDIO-04, timeline contract)
+Last activity: 2026-07-09 — Plan 01-03 complete: voice_store.py + server.py + colab_launch.py (INFRA-01, AUDIO-01..03, AUDIO-05)
 
-Progress: [██░░░░░░░░] ~10%
+Progress: [███░░░░░░░] ~17%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 3 min
-- Total execution time: 0.10 hours
+- Total execution time: 0.15 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-contracts-text-prep | 2 | 6 min | 3 min |
+| 01-contracts-text-prep | 3 | 9 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 2 min
+- Last 5 plans: 4 min, 2 min, 3 min
 - Trend: fast
 
 *Updated after each plan completion*
@@ -52,6 +52,9 @@ Recent decisions affecting current work:
 - TDD RED pattern (01-01): pytestmark skipif(Windows) on test_normalizer.py (pynini unavailable on Windows)
 - Schema (01-02): write_phase1_timeline() derives durationSec via soundfile.info() internally — invariant enforced in code, not docs
 - Normalizer (01-02): NeMo import guarded; returns (raw_text, []) on Windows; Phase 2 spoken-form contract documented in module docstring
+- Server (01-03): run_vibevoice lazy-loaded inside endpoint — server.py imports on Windows without GPU/vibevoice package
+- Server (01-03): _check_auth reads API_SECRET at call time so monkeypatch.setenv works in tests
+- VoiceStore (01-03): ponytail AUDIO-03 — 0.5B stores reference audio only; true voice conditioning needs 1.5B fork
 
 ### Pending Todos
 
@@ -65,5 +68,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed 01-02-PLAN.md — normalizer.py + schema.py committed (9fccdc9, 6e77245)
+Stopped at: Completed 01-03-PLAN.md — voice_store.py + server.py + colab_launch.py committed (4ad0e77, 088321c, daac24d)
 Resume file: None
