@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 2 of 6 (Alignment Engine)
-Plan: 2 of 3 in current phase
+Plan: 3 of 3 in current phase
 Status: In progress
-Last activity: 2026-07-09 — Plan 02-02 complete: WhisperX aligner + timeline builder (ALIGN-01, ALIGN-03)
+Last activity: 2026-07-09 — Plan 02-03 complete: ASR-WER verifier + whisper-timestamped fallback (ALIGN-02, ALIGN-04)
 
-Progress: [█████░░░░░] ~28%
+Progress: [██████░░░░] ~33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 3 min
-- Total execution time: 0.20 hours
+- Total execution time: 0.23 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-contracts-text-prep | 3 | 9 min | 3 min |
-| 02-alignment-engine | 2 | 8 min | 4 min |
+| 02-alignment-engine | 3 | 10 min | 3.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 2 min, 3 min, 3 min
+- Last 5 plans: 2 min, 4 min, 2 min, 3 min, 3 min
 - Trend: fast
 
 *Updated after each plan completion*
@@ -62,6 +62,9 @@ Recent decisions affecting current work:
 - Aligner (02-02): whisperx import guarded inside function body — align.aligner imports cleanly on Windows without whisperx/GPU
 - Schema (02-02): build_timeline() reuses tts.schema Pydantic models (Timeline etc.), returns model_dump() — no forked duplicate (I-02)
 - Schema (02-02): durationSec from librosa.get_duration(path=) enforced in code; soundfile.info() for sampleRate (both header-only reads)
+- Verifier (02-03): heavy imports (whisper, jiwer, whisper_normalizer) deferred inside compute_wer() — module loads on Windows without GPU
+- Verifier (02-03): EnglishTextNormalizer lazy-inited as global _normalizer inside compute_wer() body (avoids grep false-positive from helper fn name)
+- Fallback (02-03): whisper_timestamped guarded inside fallback_align() body; nan_ratio() exported for pipeline's structural failure detection
 
 ### Pending Todos
 
@@ -75,5 +78,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed 02-02-PLAN.md — WhisperX aligner + timeline builder committed (bd836c7, 85ed52d)
+Stopped at: Completed 02-03-PLAN.md — ASR-WER verifier + fallback committed (74213fb, df99a71)
 Resume file: None
