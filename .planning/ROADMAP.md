@@ -35,7 +35,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can supply a short reference clip and clone a voice; the cloned Indian voice is saved to disk and reused as the default speaker on all subsequent generations without re-upload
   4. Numbers, symbols, URLs, and short inputs (under ~3 words) in the script are expanded or rejected before TTS; the raw→spoken word map is preserved alongside the spoken text for caption use
   5. Running two generations back-to-back produces audio from the same persisted default voice without any manual selection
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — TDD test scaffold: conftest.py + test stubs for all INFRA-01/AUDIO-01..05 requirements (RED state)
+- [ ] 01-02-PLAN.md — Normalizer + Schema: text normalizer (AUDIO-04) + timeline.json Pydantic schema contract
+- [ ] 01-03-PLAN.md — TTS Service: FastAPI server + voice store + cloudflared Colab launch (INFRA-01, AUDIO-01..03, AUDIO-05)
 
 ### Phase 2: Alignment Engine
 **Goal**: Word-level timestamps are forced-aligned against the known spoken script, verified by ASR-WER, and emitted as the canonical timeline.json that every downstream stage reads. This phase must be verified with a real clip before Phase 4 begins.
@@ -101,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Contracts & Text Prep | 0/TBD | Not started | - |
+| 1. Contracts & Text Prep | 0/3 | Not started | - |
 | 2. Alignment Engine | 0/TBD | Not started | - |
 | 3. Storyboard | 0/TBD | Not started | - |
 | 4. Remotion Render | 0/TBD | Not started | - |
