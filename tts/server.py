@@ -41,7 +41,7 @@ def _check_auth(creds: HTTPAuthorizationCredentials = Depends(_bearer)) -> None:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
-def run_vibevoice(text: str, speaker_id: str, cfg_scale: float = 1.5):
+def run_vibevoice(text: str, speaker_id: str, cfg_scale: float | None = None):
     """Generate audio via VibeVoice 0.5B. Lazy-loaded — not called on import.
 
     Returns np.ndarray float32 at 24kHz.
@@ -54,6 +54,8 @@ def run_vibevoice(text: str, speaker_id: str, cfg_scale: float = 1.5):
 
     voice_path = voice_store.get_voice_path(speaker_id)
     mdl, proc, device = load()
+    if cfg_scale is None:
+        cfg_scale = 1.5 if is_streaming() else 1.3  # 1.3 = community rec for 1.5B pacing
 
     if not is_streaming():
         # 1.5B/Large: TRUE voice cloning — conditions on a reference WAV.
@@ -119,7 +121,7 @@ def run_vibevoice(text: str, speaker_id: str, cfg_scale: float = 1.5):
 class SynthesizeRequest(BaseModel):
     text: str
     speaker_id: str = "default"
-    cfg_scale: float = 1.5
+    cfg_scale: float | None = None  # None -> per-model default (1.5 streaming, 1.3 for 1.5B+)
 
 
 @app.post("/synthesize")

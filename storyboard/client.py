@@ -44,12 +44,22 @@ def call_llm(
         api_key=api_key or LLM_API_KEY,
         base_url=base_url or LLM_BASE_URL,
     )
-    response = client.chat.completions.create(
-        model=model or LLM_MODEL,
-        messages=messages,
-        response_format={"type": "json_object"},
-        max_tokens=2048,
-        temperature=0.3,
-    )
+    try:
+        response = client.chat.completions.create(
+            model=model or LLM_MODEL,
+            messages=messages,
+            response_format={"type": "json_object"},
+            max_tokens=2048,
+            temperature=0.3,
+        )
+    except Exception:
+        # Some providers (e.g. NVIDIA NIM models) reject response_format —
+        # retry bare; the repair layer handles non-strict JSON output.
+        response = client.chat.completions.create(
+            model=model or LLM_MODEL,
+            messages=messages,
+            max_tokens=2048,
+            temperature=0.3,
+        )
     # Guard against None content (Pitfall 2)
     return response.choices[0].message.content or ""

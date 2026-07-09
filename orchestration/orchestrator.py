@@ -114,16 +114,27 @@ def orchestrate_video(
             return
 
         # Step 3: Storyboard
-        yield "Step 3/5: Generating storyboard (LLM)...", None
         try:
             with open(timeline_path, "r", encoding="utf-8") as f:
                 t_data = json.load(f)
+            meta = t_data.get("meta", {})
+            yield (
+                "Step 3/5: Generating storyboard (LLM)... "
+                f"[align: {meta.get('alignMethod', '?')}, wer: {meta.get('wer', '?')}]"
+            ), None
             # We don't retry LLM here, the storyboard pipeline handles its own repairs.
             storyboard_pipeline(t_data, subject=subject, grade=grade)
         except Exception as e:
             logger.error("Storyboard failed: %s", traceback.format_exc())
             yield f"Error: Storyboard generation failed — {e}", None
             return
+
+        if t_data.get("meta", {}).get("storyboard") == "fallback":
+            yield (
+                "WARNING: LLM storyboard failed — video will be PLAIN TEXT scenes "
+                "(no charts/diagrams/animations). Check LLM_API_KEY and LLM_MODEL "
+                "in the Colab notebook, then regenerate."
+            ), None
 
         # Fetch labeled diagrams for 'diagram' scenes (per-scene downgrades
         # inside; belt-and-suspenders try so it can never kill the pipeline)

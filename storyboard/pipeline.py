@@ -109,6 +109,17 @@ def storyboard_pipeline(
     # Parse, validate, repair (never raises)
     items = parse_and_validate(content, sentences)
 
+    # Surface silent degradation: empty LLM content, or scenes with none of
+    # the rich fields set, means the deterministic fallback produced them.
+    used_fallback = content == "" or all(
+        not i.title and not i.emoji and not i.bullets for i in items
+    )
+    timeline.setdefault("meta", {})["storyboard"] = "fallback" if used_fallback else "llm"
+    if used_fallback:
+        logger.warning(
+            "Storyboard degraded to plain bullets — check LLM_API_KEY / LLM_MODEL / LLM_BASE_URL"
+        )
+
     # Inject timing from sentences (STORY-03)
     scenes = inject_timing(items, sentences)
     timeline["scenes"] = scenes
