@@ -3,3 +3,4 @@
 Exports:
     storyboard_pipeline  — end-to-end: sentences → LLM → scenes[] in timeline
 """
+from storyboard.pipeline import storyboard_pipeline  # noqa: F401
