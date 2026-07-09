@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-07-08)
 
 **Core value:** Narration, on-screen visuals, and captions are perfectly synced to the audio.
-**Current focus:** Phase 1 — Contracts & Text Prep
+**Current focus:** Phase 2 — Alignment Engine
 
 ## Current Position
 
-Phase: 1 of 6 (Contracts & Text Prep)
-Plan: 3 of 3 in current phase
+Phase: 2 of 6 (Alignment Engine)
+Plan: 1 of 3 in current phase
 Status: In progress
-Last activity: 2026-07-09 — Plan 01-03 complete: voice_store.py + server.py + colab_launch.py (INFRA-01, AUDIO-01..03, AUDIO-05)
+Last activity: 2026-07-09 — Plan 02-01 complete: TDD RED scaffold for align/ (ALIGN-01..04)
 
-Progress: [███░░░░░░░] ~17%
+Progress: [████░░░░░░] ~22%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: 3 min
-- Total execution time: 0.15 hours
+- Total execution time: 0.20 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-contracts-text-prep | 3 | 9 min | 3 min |
+| 02-alignment-engine | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 2 min, 3 min
+- Last 5 plans: 4 min, 2 min, 3 min, 3 min
 - Trend: fast
 
 *Updated after each plan completion*
@@ -55,6 +56,9 @@ Recent decisions affecting current work:
 - Server (01-03): run_vibevoice lazy-loaded inside endpoint — server.py imports on Windows without GPU/vibevoice package
 - Server (01-03): _check_auth reads API_SECRET at call time so monkeypatch.setenv works in tests
 - VoiceStore (01-03): ponytail AUDIO-03 — 0.5B stores reference audio only; true voice conditioning needs 1.5B fork
+- TDD RED pattern (02-01): xfail(strict=False) used throughout — xpass won't fail suite when implementation arrives
+- TDD RED pattern (02-01): real_wav_path uses pytest.skip (not xfail) — aligner/verifier tests show SKIPPED on Windows (correct)
+- TDD RED pattern (02-01): soundfile+librosa available on Windows — synthetic_wav fixture runs natively without importorskip guard
 
 ### Pending Todos
 
@@ -68,5 +72,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed 01-03-PLAN.md — voice_store.py + server.py + colab_launch.py committed (4ad0e77, 088321c, daac24d)
+Stopped at: Completed 02-01-PLAN.md — align/ TDD RED scaffold committed (100206a, 48a1649)
 Resume file: None

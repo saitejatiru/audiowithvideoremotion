@@ -15,10 +15,10 @@
 
 ### Alignment (Sync)
 
-- [ ] **ALIGN-01**: System produces word-level timestamps by forced-aligning the known script to the audio (WhisperX)
-- [ ] **ALIGN-02**: System verifies TTS fidelity via ASR-WER and flags/regenerates when drift exceeds a threshold
-- [ ] **ALIGN-03**: System emits `timeline.json` (words, sentences, durations, speaker) as the canonical contract
-- [ ] **ALIGN-04**: System falls back to whisper-timestamped when forced alignment fails
+- [x] **ALIGN-01**: System produces word-level timestamps by forced-aligning the known script to the audio (WhisperX)
+- [x] **ALIGN-02**: System verifies TTS fidelity via ASR-WER and flags/regenerates when drift exceeds a threshold
+- [x] **ALIGN-03**: System emits `timeline.json` (words, sentences, durations, speaker) as the canonical contract
+- [x] **ALIGN-04**: System falls back to whisper-timestamped when forced alignment fails
 
 ### Storyboard (LLM)
 
@@ -79,10 +79,10 @@
 | AUDIO-03 | Phase 1 | Complete |
 | AUDIO-04 | Phase 1 | Complete |
 | AUDIO-05 | Phase 1 | Complete |
-| ALIGN-01 | Phase 2 | Pending |
-| ALIGN-02 | Phase 2 | Pending |
-| ALIGN-03 | Phase 2 | Pending |
-| ALIGN-04 | Phase 2 | Pending |
+| ALIGN-01 | Phase 2 | Complete |
+| ALIGN-02 | Phase 2 | Complete |
+| ALIGN-03 | Phase 2 | Complete |
+| ALIGN-04 | Phase 2 | Complete |
 | STORY-01 | Phase 3 | Pending |
 | STORY-02 | Phase 3 | Pending |
 | STORY-03 | Phase 3 | Pending |

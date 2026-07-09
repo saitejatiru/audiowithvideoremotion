@@ -107,7 +107,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Contracts & Text Prep | 3/3 | Complete   | 2026-07-09 |
-| 2. Alignment Engine | 0/TBD | Not started | - |
+| 2. Alignment Engine | 1/4 | In Progress|  |
 | 3. Storyboard | 0/TBD | Not started | - |
 | 4. Remotion Render | 0/TBD | Not started | - |
 | 5. Post-processing | 0/TBD | Not started | - |
