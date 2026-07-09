@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Contracts & Text Prep** - GPU HTTP endpoint live, script normalizer running, timeline.json schema defined, default voice persisted (completed 2026-07-09)
 - [ ] **Phase 2: Alignment Engine** - Word-level timestamps from forced alignment, ASR-WER guard, timeline.json emitted
-- [ ] **Phase 3: Storyboard** - LLM generates schema-validated scene content per sentence
+- [x] **Phase 3: Storyboard** - LLM generates schema-validated scene content per sentence (completed 2026-07-09)
 - [ ] **Phase 4: Remotion Render** - Video synced to audio with word-level captions and correct duration
 - [ ] **Phase 5: Post-processing** - Metadata stripped, output web-ready
 - [ ] **Phase 6: Platform** - Gradio UI + orchestrator runs the full pipeline end-to-end
@@ -67,7 +67,13 @@ Plans:
   1. Given the normalized script and sentences[] from timeline.json, the LLM returns a scenes[] array with visual type, keyword/query, and on-screen text for each sentence group
   2. The scenes[] output passes schema validation; one repair retry runs on parse failure; a deterministic bullet-from-sentences fallback activates when repair also fails — generation never crashes on bad LLM output
   3. Every scene's start/end is derived from sentence-aligned timestamps from timeline.json; no scene boundary falls mid-word or between two words in the same sentence
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [x] 03-01-PLAN.md — Schema + test scaffold: LLMSceneItem, LLMScenesResponse, TimelineScene (12 passed)
+- [x] 03-02-PLAN.md — Prompter + Client: system prompt with embedded schema, OpenAI-compatible client
+- [x] 03-03-PLAN.md — Repair + Fallback: three-layer defense (strict → json-repair → bullet fallback)
+- [x] 03-04-PLAN.md — Pipeline integration: storyboard_pipeline + inject_timing
 
 ### Phase 4: Remotion Render
 **Goal**: Remotion consumes timeline.json and renders a synced MP4 — narration audio embedded, scenes switching at sentence boundaries, word-level captions frame-accurate, total duration matching the actual audio length.
@@ -108,7 +114,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Contracts & Text Prep | 3/3 | Complete   | 2026-07-09 |
 | 2. Alignment Engine | 4/4 | Code complete — Colab gate pending | 2026-07-09 |
-| 3. Storyboard | 0/TBD | Not started | - |
+| 3. Storyboard | 4/4 | Code complete — LLM test needs API key | 2026-07-09 |
 | 4. Remotion Render | 0/TBD | Not started | - |
 | 5. Post-processing | 0/TBD | Not started | - |
 | 6. Platform | 0/TBD | Not started | - |

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-07-08)
 
 **Core value:** Narration, on-screen visuals, and captions are perfectly synced to the audio.
-**Current focus:** Phase 2 — Alignment Engine
+**Current focus:** Phase 3 — Storyboard (code complete)
 
 ## Current Position
 
-Phase: 2 of 6 (Alignment Engine)
+Phase: 3 of 6 (Storyboard)
 Plan: 4 of 4 in current phase
-Status: Phase 2 code complete — awaiting Colab GPU isolation gate before Phase 4 begins
-Last activity: 2026-07-09 — Plan 02-04 complete: align_pipeline.py orchestrator + pipeline unit tests + Colab isolation scripts (ALIGN-01..04)
+Status: Phase 3 code complete — 45 tests passing, LLM integration needs API key
+Last activity: 2026-07-09 — Plan 03-04 complete: pipeline.py orchestrator + timing injection + full test suite
 
-Progress: [███████░░░] ~38%
+Progress: [█████████░] ~50%
 
 ## Performance Metrics
 
@@ -29,6 +29,7 @@ Progress: [███████░░░] ~38%
 |-------|-------|-------|----------|
 | 01-contracts-text-prep | 3 | 9 min | 3 min |
 | 02-alignment-engine | 4 | 13 min | 3.25 min |
+| 03-storyboard | 4 | 7 min | 1.75 min |
 
 **Recent Trend:**
 - Last 5 plans: 4 min, 2 min, 3 min, 3 min, 3 min
@@ -68,6 +69,12 @@ Recent decisions affecting current work:
 - Pipeline (02-04): AlignmentDriftError raised (not silent fallback) on WER > threshold — Phase 6 catches and retries TTS once, then calls use_fallback=True
 - Pipeline (02-04): NaN ratio check runs before WER guard — avoids wasted Whisper inference on structurally broken alignment
 - Pipeline (02-04): Phase 4 BLOCKED until isolation_test.py passes on Colab GPU with TEST_CLIP_PATH set
+- Schema (03-01): LLMSceneItem uses extra='ignore' to silently drop hallucinated timing fields from LLM
+- Schema (03-01): TimelineScene enforces timing injection from sentences[] — LLM never sets start/end
+- Prompter (03-02): System prompt embeds model_json_schema() and includes 'json' keyword for DeepSeek compatibility
+- Client (03-02): openai import deferred inside call_llm() body — storyboard/ imports cleanly without openai package
+- Repair (03-03): Three-layer defense: strict json.loads → json-repair → deterministic bullet fallback; never raises
+- Pipeline (03-04): call_llm imported at pipeline module level (deferred openai import is inside client.py); enables mock.patch in tests
 
 ### Pending Todos
 
@@ -81,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed 02-04-PLAN.md — align_pipeline.py + tests + Colab isolation scripts (8549c15, c4b7146)
+Stopped at: Completed Phase 3 — storyboard/ module with schema, prompter, client, repair, pipeline (45 tests, 3 commits)
 Resume file: None
