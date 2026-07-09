@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-07-08)
 
 **Core value:** Narration, on-screen visuals, and captions are perfectly synced to the audio.
-**Current focus:** Phase 4 — Remotion Render (code complete)
+**Current focus:** Phase 5 — Post-processing (code complete)
 
 ## Current Position
 
-Phase: 4 of 6 (Remotion Render)
-Plan: 3 of 3 in current phase
-Status: Phase 4 code complete — Remotion project setup + video components compile + python bridge (9 tests passing)
-Last activity: 2026-07-09 — Plan 04-03 complete: render_bridge.py orchestrator CLI subprocess adapter + 9 unit tests passed
+Phase: 5 of 6 (Post-processing)
+Plan: 1 of 1 in current phase
+Status: Phase 5 code complete — ffmpeg post-processor script + ffprobe verification (7 tests passing)
+Last activity: 2026-07-09 — Plan 05-01 complete: post_processor.py metadata stripper + 7 unit tests passed
 
-Progress: [██████████] ~66%
+Progress: [███████████] ~83%
 
 ## Performance Metrics
 
@@ -31,6 +31,7 @@ Progress: [██████████] ~66%
 | 02-alignment-engine | 4 | 13 min | 3.25 min |
 | 03-storyboard | 4 | 7 min | 1.75 min |
 | 04-remotion-render | 3 | 6 min | 2 min |
+| 05-post-processing | 1 | 3 min | 3 min |
 
 **Recent Trend:**
 - Last 5 plans: 4 min, 2 min, 3 min, 3 min, 3 min
@@ -80,6 +81,8 @@ Recent decisions affecting current work:
 - Render (04-02): SceneRenderer + CaptionRenderer map current playback time from useCurrentFrame() / fps (STORY-03)
 - Render (04-02): CaptionRenderer maps speaker indices to cyan/amber/etc. colors (VIDEO-04)
 - Render (04-03): render_bridge.py spawns subprocess for npx remotion render and checks output duration using ffprobe
+- Post (05-01): post_processor.py executes ffmpeg subprocess to copy streams while stripping metadata and adding faststart
+- Post (05-01): verify_metadata_stripped() uses ffprobe JSON parser to verify container tags are empty
 
 ### Pending Todos
 
@@ -93,5 +96,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed Phase 4 — Remotion project with scene/caption components + Python render bridge (9 tests passed, TS compiles)
+Stopped at: Completed Phase 5 — post_processor.py metadata stripper + 7 tests passed
 Resume file: None

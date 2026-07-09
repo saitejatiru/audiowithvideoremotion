@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: Alignment Engine** - Word-level timestamps from forced alignment, ASR-WER guard, timeline.json emitted
 - [x] **Phase 3: Storyboard** - LLM generates schema-validated scene content per sentence (completed 2026-07-09)
 - [x] **Phase 4: Remotion Render** - Video synced to audio with word-level captions and correct duration (completed 2026-07-09)
-- [ ] **Phase 5: Post-processing** - Metadata stripped, output web-ready
+- [x] **Phase 5: Post-processing** - Metadata stripped, output web-ready (completed 2026-07-09)
 - [ ] **Phase 6: Platform** - Gradio UI + orchestrator runs the full pipeline end-to-end
 
 ## Phase Details
@@ -98,7 +98,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. The ffmpeg strip command removes all container and stream-level metadata tags from the rendered MP4 (ffprobe on the output shows no tags)
   2. The stripped MP4 plays correctly in a browser, loads without seeking delays, and has the moov atom at the file head (faststart confirmed)
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [x] 05-01-PLAN.md — Metadata Stripping & Web Faststart: ffmpeg subprocess adapter + ffprobe verification (7 tests passed)
 
 ### Phase 6: Platform
 **Goal**: A single Gradio page accepts a script, selects a voice, and runs the full normalize→TTS→align→storyboard→render→strip pipeline end-to-end with automatic retry on transient failures.
@@ -121,5 +124,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Alignment Engine | 4/4 | Code complete — Colab gate pending | 2026-07-09 |
 | 3. Storyboard | 4/4 | Code complete — LLM test needs API key | 2026-07-09 |
 | 4. Remotion Render | 3/3 | Code complete — needs Colab headless test | 2026-07-09 |
-| 5. Post-processing | 0/TBD | Not started | - |
+| 5. Post-processing | 1/1 | Code complete — needs Colab ffmpeg test | 2026-07-09 |
 | 6. Platform | 0/TBD | Not started | - |
