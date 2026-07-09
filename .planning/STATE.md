@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-07-08)
 ## Current Position
 
 Phase: 2 of 6 (Alignment Engine)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-07-09 — Plan 02-01 complete: TDD RED scaffold for align/ (ALIGN-01..04)
+Last activity: 2026-07-09 — Plan 02-02 complete: WhisperX aligner + timeline builder (ALIGN-01, ALIGN-03)
 
-Progress: [████░░░░░░] ~22%
+Progress: [█████░░░░░] ~28%
 
 ## Performance Metrics
 
@@ -28,7 +28,7 @@ Progress: [████░░░░░░] ~22%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-contracts-text-prep | 3 | 9 min | 3 min |
-| 02-alignment-engine | 1 | 3 min | 3 min |
+| 02-alignment-engine | 2 | 8 min | 4 min |
 
 **Recent Trend:**
 - Last 5 plans: 4 min, 2 min, 3 min, 3 min
@@ -59,6 +59,9 @@ Recent decisions affecting current work:
 - TDD RED pattern (02-01): xfail(strict=False) used throughout — xpass won't fail suite when implementation arrives
 - TDD RED pattern (02-01): real_wav_path uses pytest.skip (not xfail) — aligner/verifier tests show SKIPPED on Windows (correct)
 - TDD RED pattern (02-01): soundfile+librosa available on Windows — synthetic_wav fixture runs natively without importorskip guard
+- Aligner (02-02): whisperx import guarded inside function body — align.aligner imports cleanly on Windows without whisperx/GPU
+- Schema (02-02): build_timeline() reuses tts.schema Pydantic models (Timeline etc.), returns model_dump() — no forked duplicate (I-02)
+- Schema (02-02): durationSec from librosa.get_duration(path=) enforced in code; soundfile.info() for sampleRate (both header-only reads)
 
 ### Pending Todos
 
@@ -72,5 +75,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-09
-Stopped at: Completed 02-01-PLAN.md — align/ TDD RED scaffold committed (100206a, 48a1649)
+Stopped at: Completed 02-02-PLAN.md — WhisperX aligner + timeline builder committed (bd836c7, 85ed52d)
 Resume file: None
