@@ -48,16 +48,25 @@ def parse_and_validate(
     """
     n_sentences = len(sentences)
 
+    def _fit(items: list[LLMSceneItem]) -> list[LLMSceneItem]:
+        """Salvage a wrong-count response: trim extras, pad the tail with
+        bullets. Rich scenes are kept — a count mismatch used to throw away
+        the ENTIRE response, which flattened whole videos."""
+        if len(items) != n_sentences:
+            logger.warning(
+                "LLM returned %d scenes for %d sentences — trimming/padding",
+                len(items), n_sentences,
+            )
+            items = items[:n_sentences]
+            items = items + _bullet_fallback(sentences[len(items):])
+        return items
+
     # Layer 1: strict parse
     try:
         data = json.loads(content)
         items = LLMScenesResponse.model_validate(data).scenes
-        if len(items) == n_sentences:
-            return items
-        logger.warning(
-            "LLM returned %d scenes but expected %d — trying repair",
-            len(items), n_sentences,
-        )
+        if items:
+            return _fit(items)
     except (json.JSONDecodeError, ValidationError, Exception) as e:
         logger.warning("Strict parse failed: %s — trying repair", e)
 
@@ -72,13 +81,9 @@ def parse_and_validate(
         else:
             data = repaired
         items = LLMScenesResponse.model_validate(data).scenes
-        if len(items) == n_sentences:
-            logger.info("Repair succeeded — %d scenes recovered", n_sentences)
-            return items
-        logger.warning(
-            "Repaired JSON has %d scenes, expected %d — falling back",
-            len(items), n_sentences,
-        )
+        if items:
+            logger.info("Repair succeeded — %d scenes recovered", len(items))
+            return _fit(items)
     except Exception as e:
         logger.warning("Repair also failed: %s — falling back to bullets", e)
 

@@ -463,10 +463,13 @@ export const SceneRenderer: React.FC<{ scenes: TimelineScene[] }> = ({ scenes })
   return (
     <AbsoluteFill>
       {scenes.map((scene, i) => {
-        const from = Math.round(scene.start * fps);
-        const isLast = i === scenes.length - 1;
-        // last scene extends to the end of the audio (no dead air)
-        const until = isLast ? durationInFrames : Math.round(scene.end * fps);
+        // first scene covers any leading silence from frame 0
+        const from = i === 0 ? 0 : Math.round(scene.start * fps);
+        const next = scenes[i + 1] ?? null;
+        // hold each scene until the NEXT one starts (sentence gaps = narration
+        // pauses — ending at scene.end left BLANK frames during every pause);
+        // last scene extends to the end of the audio
+        const until = next ? Math.round(next.start * fps) : durationInFrames;
         const dur = Math.max(1, until - from);
         return (
           <Sequence key={scene.idx} from={from} durationInFrames={dur}>
