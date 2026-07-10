@@ -40,8 +40,10 @@ export interface SceneVisual {
     | "formula"
     | "diagram";
   query: string;
-  image?: string; // public/-relative diagram file (set by asset fetcher)
-  credit?: string; // license attribution for the diagram
+  image?: string; // public/-relative diagram file (diagram scenes only)
+  asset?: string; // public/-relative background illustration/video file
+  assetKind?: "image" | "video"; // how to render `asset`
+  credit?: string; // license attribution
 }
 
 export interface SceneChart {

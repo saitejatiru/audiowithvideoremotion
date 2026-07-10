@@ -143,13 +143,15 @@ def orchestrate_video(
                 return
             yield f"WARNING: LLM storyboard failed ({err}) — rendering heuristic scenes.", None
 
-        # Fetch labeled diagrams for 'diagram' scenes (per-scene downgrades
-        # inside; belt-and-suspenders try so it can never kill the pipeline)
+        # Fetch real visuals per scene: Wikimedia diagrams + Pixabay
+        # illustrations/video (per-scene no-ops on failure; belt-and-suspenders
+        # try so it can never kill the pipeline)
+        yield "Step 3/5: Fetching illustrations & diagrams...", None
         try:
-            from storyboard.assets import fetch_diagrams
-            fetch_diagrams(t_data, run_dir)
+            from storyboard.assets import fetch_scene_assets
+            fetch_scene_assets(t_data, run_dir)
         except Exception:
-            logger.warning("Diagram fetch skipped: %s", traceback.format_exc())
+            logger.warning("Asset fetch skipped: %s", traceback.format_exc())
 
         # Inject user-selected format + raw→spoken word map into timeline meta
         t_data.setdefault("meta", {})["format"] = video_format

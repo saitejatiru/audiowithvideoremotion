@@ -70,19 +70,23 @@ def render_video(
         shutil.copy2(audio_src, public_dir / audio_name)
         timeline["audio"]["path"] = audio_name
 
-    # Diagram assets fetched next to timeline.json → also into public/.
-    # Missing file: drop the key so the component falls back to emoji/text.
+    # Fetched assets sit next to timeline.json → copy into public/ so
+    # staticFile() resolves them. Missing file: drop the key so the component
+    # falls back to its CSS template (never a broken <Img>/<Video>).
     for scene in timeline.get("scenes", []):
         visual = scene.get("visual", {})
-        img = visual.get("image")
-        if not img:
-            continue
-        src = os.path.join(os.path.dirname(timeline_path), img)
-        if os.path.exists(src):
-            public_dir.mkdir(exist_ok=True)
-            shutil.copy2(src, public_dir / img)
-        else:
-            visual.pop("image", None)
+        for key in ("image", "asset"):  # diagram card / background layer
+            fname = visual.get(key)
+            if not fname:
+                continue
+            src = os.path.join(os.path.dirname(timeline_path), fname)
+            if os.path.exists(src):
+                public_dir.mkdir(exist_ok=True)
+                shutil.copy2(src, public_dir / fname)
+            else:
+                visual.pop(key, None)
+                if key == "asset":
+                    visual.pop("assetKind", None)
 
     # The composition expects props of shape {timeline: ...}; --props merges
     # the JSON file at top level, so wrap before passing.

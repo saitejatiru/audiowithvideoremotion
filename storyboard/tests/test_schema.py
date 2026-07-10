@@ -35,11 +35,11 @@ class TestLLMSceneItem:
         assert item.visual_type == "code"
 
     def test_invalid_visual_type_raises(self):
-        """visual_type must be exactly bullet/image/code — Pitfall 4."""
+        """visual_type must be one of the known templates — Pitfall 4."""
         with pytest.raises(ValidationError, match="visual_type"):
             LLMSceneItem(
                 on_screen_text="test",
-                visual_type="diagram",  # invalid
+                visual_type="hologram",  # not a real template
                 visual_query="test",
             )
 
@@ -56,9 +56,10 @@ class TestLLMSceneItem:
         assert not hasattr(item, "start")
         assert not hasattr(item, "end")
         assert not hasattr(item, "duration")
-        # Only declared fields survive
+        # Undeclared fields dropped; declared rich fields (title/bullets/...) remain
         dump = item.model_dump()
-        assert set(dump.keys()) == {"on_screen_text", "visual_type", "visual_query"}
+        assert {"start", "end", "duration"}.isdisjoint(dump.keys())
+        assert {"on_screen_text", "visual_type", "visual_query"} <= set(dump.keys())
 
     def test_missing_required_field_raises(self):
         with pytest.raises(ValidationError):

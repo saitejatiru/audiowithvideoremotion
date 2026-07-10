@@ -10,6 +10,7 @@ import React from "react";
 import {
   AbsoluteFill,
   Img,
+  OffthreadVideo,
   Sequence,
   interpolate,
   spring,
@@ -20,6 +21,47 @@ import {
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import type { TimelineScene } from "../types";
+
+/**
+ * Background layer: a real Pixabay illustration or stock video behind the
+ * scene, with a dark scrim so the animated text stays readable. Absent asset
+ * → transparent (the animated gradient/template shows through). Diagram scenes
+ * skip this — they render the diagram as a foreground card instead.
+ */
+const SceneBackground: React.FC<{ scene: TimelineScene }> = ({ scene }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const { asset, assetKind, type } = scene.visual;
+  if (!asset || type === "diagram") return null;
+
+  // slow Ken Burns on stills so a static illustration still feels alive
+  const zoom = interpolate(frame, [0, fps * 10], [1.05, 1.15], {
+    extrapolateRight: "clamp",
+  });
+  return (
+    <AbsoluteFill>
+      {assetKind === "video" ? (
+        <OffthreadVideo
+          src={staticFile(asset)}
+          muted
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      ) : (
+        <Img
+          src={staticFile(asset)}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transform: `scale(${zoom})`,
+          }}
+        />
+      )}
+      {/* scrim: darken so white text keeps contrast over any image */}
+      <AbsoluteFill style={{ background: "rgba(9, 14, 26, 0.68)" }} />
+    </AbsoluteFill>
+  );
+};
 
 const ACCENTS: Record<string, string> = {
   bullet: "#3B82F6",
@@ -473,6 +515,7 @@ export const SceneRenderer: React.FC<{ scenes: TimelineScene[] }> = ({ scenes })
         const dur = Math.max(1, until - from);
         return (
           <Sequence key={scene.idx} from={from} durationInFrames={dur}>
+            <SceneBackground scene={scene} />
             <AbsoluteFill
               style={{
                 justifyContent: "center",
