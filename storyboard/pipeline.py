@@ -11,7 +11,7 @@ import os
 
 from storyboard.schema import LLMSceneItem, TimelineScene
 from storyboard.prompter import build_system_prompt, build_user_prompt
-from storyboard.repair import parse_and_validate
+from storyboard.repair import parse_and_validate, smart_fallback
 from storyboard.client import call_llm
 
 
@@ -94,6 +94,7 @@ def storyboard_pipeline(
     ]
 
     # Call LLM
+    llm_error = ""
     try:
         content = call_llm(
             messages,
@@ -104,6 +105,7 @@ def storyboard_pipeline(
         logger.info("LLM returned %d chars", len(content))
     except Exception as e:
         logger.warning("LLM call failed: %s — using fallback", e)
+        llm_error = str(e)
         content = ""
 
     # Parse, validate, repair (never raises)
@@ -114,11 +116,16 @@ def storyboard_pipeline(
     used_fallback = content == "" or all(
         not i.title and not i.emoji and not i.bullets for i in items
     )
-    timeline.setdefault("meta", {})["storyboard"] = "fallback" if used_fallback else "llm"
+    meta = timeline.setdefault("meta", {})
+    meta["storyboard"] = "fallback" if used_fallback else "llm"
     if used_fallback:
+        meta["storyboardError"] = llm_error or "LLM returned unusable output"
         logger.warning(
-            "Storyboard degraded to plain bullets — check LLM_API_KEY / LLM_MODEL / LLM_BASE_URL"
+            "Storyboard degraded — %s. Check LLM_API_KEY / LLM_MODEL / LLM_BASE_URL",
+            meta["storyboardError"],
         )
+        # heuristic scenes: numbers, steps, formulas — animated even without LLM
+        items = smart_fallback(sentences)
 
     # Inject timing from sentences (STORY-03)
     scenes = inject_timing(items, sentences)

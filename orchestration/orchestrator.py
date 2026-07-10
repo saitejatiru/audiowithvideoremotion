@@ -130,11 +130,18 @@ def orchestrate_video(
             return
 
         if t_data.get("meta", {}).get("storyboard") == "fallback":
-            yield (
-                "WARNING: LLM storyboard failed — video will be PLAIN TEXT scenes "
-                "(no charts/diagrams/animations). Check LLM_API_KEY and LLM_MODEL "
-                "in the Colab notebook, then regenerate."
-            ), None
+            # Refuse to burn a 10-minute render on a degraded storyboard.
+            # ALLOW_PLAIN_VIDEO=1 renders anyway using heuristic scenes.
+            err = t_data["meta"].get("storyboardError", "unknown")
+            if not os.environ.get("ALLOW_PLAIN_VIDEO"):
+                yield (
+                    f"Error: LLM storyboard FAILED — {err}\n"
+                    "Not rendering a degraded video. Fix cell 2 in the Colab notebook "
+                    "(it must print 'LLM OK'), then regenerate. To render anyway with "
+                    "heuristic scenes, set ALLOW_PLAIN_VIDEO=1 and restart app.py."
+                ), None
+                return
+            yield f"WARNING: LLM storyboard failed ({err}) — rendering heuristic scenes.", None
 
         # Fetch labeled diagrams for 'diagram' scenes (per-scene downgrades
         # inside; belt-and-suspenders try so it can never kill the pipeline)

@@ -9,6 +9,7 @@ This function NEVER raises — it always returns a valid list[LLMSceneItem].
 """
 import json
 import logging
+import re
 
 from pydantic import ValidationError
 
@@ -16,6 +17,49 @@ from storyboard.schema import LLMSceneItem, LLMScenesResponse
 
 
 logger = logging.getLogger(__name__)
+
+_SEQ_RE = re.compile(r"\b(first|then|next|after that|finally|step\s*\d)\b", re.I)
+_NUM_RE = re.compile(r"\b\d[\d,]*(?:\.\d+)?%?\b")
+_EQ_RE = re.compile(r"[A-Za-z0-9)\]]\s*=\s*[A-Za-z0-9(\[]")
+
+
+def smart_fallback(sentences: list[dict]) -> list[LLMSceneItem]:
+    """No-LLM storyboard from cheap text heuristics — animated, never plain.
+
+    Conservative on purpose: no diagram scenes (a wrong labeled diagram is a
+    correctness liability in education content); formula only on a clear
+    equation match (invalid LaTeX renders as plain text in the component).
+    """
+    items = []
+    for s in sentences:
+        text = s["text"]
+        title = " ".join(text.split()[:4]).rstrip(".,;:")
+        nums = _NUM_RE.findall(text)
+        if _EQ_RE.search(text):
+            items.append(LLMSceneItem(
+                on_screen_text=text[:120], visual_type="formula",
+                visual_query=title, title=title, formula=text.strip()[:80],
+            ))
+        elif _SEQ_RE.search(text):
+            parts = [p.strip() for p in re.split(
+                r",|;|\bthen\b|\bnext\b|\bfinally\b", text, flags=re.I) if p.strip()]
+            bullets = [" ".join(p.split()[:4]).rstrip(".,;:") for p in parts[:4]]
+            # schema validator downgrades to bullet if fewer than 2 stages
+            items.append(LLMSceneItem(
+                on_screen_text=text[:120], visual_type="steps",
+                visual_query=title, title=title, bullets=bullets,
+            ))
+        elif nums:
+            items.append(LLMSceneItem(
+                on_screen_text=nums[0], visual_type="big-number",
+                visual_query=title, title=title,
+            ))
+        else:
+            items.append(LLMSceneItem(
+                on_screen_text=text[:120], visual_type="bullet",
+                visual_query=" ".join(text.split()[:3]), title=title,
+            ))
+    return items
 
 
 def _bullet_fallback(sentences: list[dict]) -> list[LLMSceneItem]:
