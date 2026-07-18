@@ -49,12 +49,17 @@ const paginate = (words: TimelineWord[]): Page[] => {
   return pages;
 };
 
-const CaptionPage: React.FC<{ page: Page; nextStart: number | null }> = ({ page }) => {
+const CaptionPage: React.FC<{
+  page: Page;
+  nextStart: number | null;
+  style?: "dark" | "whiteboard";
+}> = ({ page, style = "dark" }) => {
   const frame = useCurrentFrame();
   const { fps, width } = useVideoConfig();
   const currentTime = page.start + frame / fps; // frame is sequence-relative
   const pop = spring({ frame, fps, config: { damping: 20, stiffness: 300 } });
   const fontSize = width < 1200 ? 64 : 76; // 9:16 vs 16:9
+  const wb = style === "whiteboard";
 
   return (
     <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "center" }}>
@@ -72,6 +77,27 @@ const CaptionPage: React.FC<{ page: Page; nextStart: number | null }> = ({ page 
         {page.words.map((word, i) => {
           const isActive = currentTime >= word.start && currentTime < word.end;
           const highlight = SPEAKER_COLORS[word.speaker] || SPEAKER_COLORS[1];
+          if (wb) {
+            // whiteboard: dark ink; the active word gets a marker-highlighter
+            // sweep behind it (yellow), like a teacher highlighting the board
+            return (
+              <span
+                key={i}
+                style={{
+                  fontSize: fontSize - 8,
+                  fontWeight: 800,
+                  color: isActive ? "#111827" : "#334155",
+                  background: isActive ? highlight : "transparent",
+                  borderRadius: 10,
+                  padding: "0 10px",
+                  transform: isActive ? "scale(1.08)" : "scale(1)",
+                  lineHeight: 1.35,
+                }}
+              >
+                {word.w}
+              </span>
+            );
+          }
           return (
             <span
               key={i}
@@ -96,7 +122,10 @@ const CaptionPage: React.FC<{ page: Page; nextStart: number | null }> = ({ page 
   );
 };
 
-export const CaptionRenderer: React.FC<{ words: TimelineWord[] }> = ({ words }) => {
+export const CaptionRenderer: React.FC<{
+  words: TimelineWord[];
+  style?: "dark" | "whiteboard";
+}> = ({ words, style = "dark" }) => {
   const { fps, durationInFrames } = useVideoConfig();
   const pages = useMemo(() => paginate(words), [words]);
 
@@ -110,7 +139,7 @@ export const CaptionRenderer: React.FC<{ words: TimelineWord[] }> = ({ words }) 
         const dur = Math.max(1, until - from);
         return (
           <Sequence key={i} from={from} durationInFrames={dur}>
-            <CaptionPage page={page} nextStart={next ? next.start : null} />
+            <CaptionPage page={page} nextStart={next ? next.start : null} style={style} />
           </Sequence>
         );
       })}

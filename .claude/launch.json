@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gradio-app",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["app.py"],
+      "port": 7860
+    },
+    {
+      "name": "remotion-studio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "video", "run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "tts-server",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "uvicorn", "tts.server:app", "--port", "8000"],
+      "port": 8000
+    }
+  ]
+}

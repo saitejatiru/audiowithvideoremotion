@@ -56,6 +56,7 @@ def orchestrate_video(
     video_format: str = "16:9",
     subject: str = "Auto-detect",
     grade: str = "Auto-detect",
+    style: str = "Whiteboard (scribe)",
 ):
     """Generator that runs the full pipeline and yields progress updates.
 
@@ -153,8 +154,9 @@ def orchestrate_video(
         except Exception:
             logger.warning("Asset fetch skipped: %s", traceback.format_exc())
 
-        # Inject user-selected format + raw→spoken word map into timeline meta
+        # Inject user-selected format/style + raw→spoken word map into timeline meta
         t_data.setdefault("meta", {})["format"] = video_format
+        t_data["meta"]["style"] = "whiteboard" if style.lower().startswith("white") else "dark"
         if word_map:
             t_data["meta"]["wordMap"] = word_map
         with open(timeline_path, "w", encoding="utf-8") as f:

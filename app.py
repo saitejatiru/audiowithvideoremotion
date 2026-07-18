@@ -43,6 +43,11 @@ def build_ui():
                             value="16:9",
                             label="Video Format (YouTube vs Reels/Shorts)"
                         )
+                        style_radio = gr.Radio(
+                            choices=["Whiteboard (scribe)", "Dark"],
+                            value="Whiteboard (scribe)",
+                            label="Explanation Style"
+                        )
                         with gr.Row():
                             subject_dropdown = gr.Dropdown(
                                 choices=["Auto-detect", "Mathematics", "Physics",
@@ -70,7 +75,7 @@ def build_ui():
                 generate_btn.click(
                     fn=orchestrate_video,
                     inputs=[script_input, voice_dropdown, backend_url, format_radio,
-                            subject_dropdown, grade_dropdown],
+                            subject_dropdown, grade_dropdown, style_radio],
                     outputs=[status_output, video_output],
                 )
 
