@@ -18,13 +18,14 @@ def _write_timeline(wav_path, spoken_text, output_path, **kwargs):
 class TestOrchestrateVideo:
     """Tests the orchestrate_video generator."""
 
+    @patch("storyboard.client.call_llm", return_value="ok")
     @patch("orchestration.orchestrator.post_process_video")
     @patch("orchestration.orchestrator.render_video")
     @patch("orchestration.orchestrator.storyboard_pipeline")
     @patch("orchestration.orchestrator.run_alignment", side_effect=_write_timeline)
     @patch("orchestration.orchestrator.sf.write")
     @patch("orchestration.orchestrator._run_tts_with_retry")
-    def test_successful_run(self, mock_tts, mock_sf, mock_align, mock_storyboard, mock_render, mock_post):
+    def test_successful_run(self, mock_tts, mock_sf, mock_align, mock_storyboard, mock_render, mock_post, mock_llm):
         """Pipeline successfully yields 5 steps and completes."""
         mock_tts.return_value = (24000, [0.0, 0.0])
 
@@ -65,24 +66,26 @@ class TestOrchestrateVideo:
         assert "too short" in states[0][0]
         assert states[0][1] is None
 
+    @patch("storyboard.client.call_llm", return_value="ok")
     @patch("orchestration.orchestrator._run_tts_with_retry", side_effect=Exception("API down"))
-    def test_tts_failure_stops_pipeline(self, mock_tts):
-        """Exception in TTS stops pipeline after Step 1."""
+    def test_tts_failure_stops_pipeline(self, mock_tts, mock_llm):
+        """Exception in TTS stops the pipeline with a TTS error (after the LLM pre-check)."""
         gen = orchestrate_video("Hello there friend", "v1", "")
         states = list(gen)
 
-        assert len(states) == 2
-        assert "Step 1/5" in states[0][0]
-        assert "Error: TTS failed" in states[1][0]
-        assert "API down" in states[1][0]
+        texts = [s[0] for s in states]
+        assert any("Step 1/5" in t for t in texts)
+        assert "Error: TTS failed" in texts[-1]
+        assert "API down" in texts[-1]
 
+    @patch("storyboard.client.call_llm", return_value="ok")
     @patch("orchestration.orchestrator.post_process_video")
     @patch("orchestration.orchestrator.render_video")
     @patch("orchestration.orchestrator.storyboard_pipeline")
     @patch("orchestration.orchestrator.sf.write")
     @patch("orchestration.orchestrator._run_tts_with_retry")
     @patch("orchestration.orchestrator.run_alignment")
-    def test_alignment_drift_triggers_fallback(self, mock_align, mock_tts, mock_sf, mock_sb, mock_ren, mock_post):
+    def test_alignment_drift_triggers_fallback(self, mock_align, mock_tts, mock_sf, mock_sb, mock_ren, mock_post, mock_llm):
         """AlignmentDriftError triggers a retry with use_fallback=True."""
         mock_tts.return_value = (24000, [0.0])
 

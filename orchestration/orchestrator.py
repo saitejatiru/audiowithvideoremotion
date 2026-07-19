@@ -77,6 +77,31 @@ def orchestrate_video(
         yield f"Error: {e}", None
         return
 
+    # FAIL FAST: verify the LLM key NOW, before the slow TTS/align/Manim.
+    # A bad key used to surface only at the storyboard step — after ~25 min of
+    # wasted compute. This 2-second ping catches 401/expired/out-of-credits up front.
+    yield "Step 0/5: Checking LLM key...", None
+    try:
+        from storyboard.client import call_llm
+        call_llm([{"role": "user", "content": "ping"}])
+    except Exception as e:
+        msg = str(e)
+        if "401" in msg or "Unauthorized" in msg:
+            hint = (
+                "401 Unauthorized — your LLM key is invalid, expired, or out of free "
+                "credits.\n"
+                " • Re-check cell 2 printed 'LLM OK' with the SAME key, and RESTART "
+                "cell 8 (app.py) after changing keys — a running app keeps the old key.\n"
+                " • If cell 2 says OK but this fails, the app has a stale key: re-run cell 8.\n"
+                " • NVIDIA free credits can run out — regenerate a key at build.nvidia.com, "
+                "or switch to Groq (free, reliable): base https://api.groq.com/openai/v1, "
+                "model llama-3.3-70b-versatile, key from console.groq.com."
+            )
+        else:
+            hint = f"LLM call failed: {msg}"
+        yield f"Error: LLM check failed before generation.\n{hint}", None
+        return
+
     # Create a unique temporary directory for this run's artifacts
     temp_dir_obj = tempfile.TemporaryDirectory(prefix="vibevoice_run_")
     run_dir = temp_dir_obj.name
