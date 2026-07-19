@@ -120,6 +120,21 @@ class TestParseAndValidate:
         assert len(items) == len(sample_sentences)
         assert all(item.visual_type == "bullet" for item in items)
 
+    def test_one_malformed_scene_kept_others(self, sample_sentences):
+        """A single bad scene item (e.g. truncated tail) must NOT discard the
+        whole response — good scenes survive, bad ones become bullets."""
+        raw = {
+            "scenes": [
+                {"on_screen_text": "a", "visual_type": "bullet", "visual_query": "a"},
+                ["on_screen_text"],  # malformed (a list, like the truncation bug)
+                {"on_screen_text": "c", "visual_type": "image", "visual_query": "c"},
+            ]
+        }
+        items = parse_and_validate(json.dumps(raw), sample_sentences)
+        assert len(items) == len(sample_sentences)
+        # the two valid rich scenes are preserved (image type survived)
+        assert any(i.visual_type == "image" for i in items)
+
     def test_never_raises(self, sample_sentences):
         """parse_and_validate must NEVER raise, no matter the input."""
         hostile_inputs = [

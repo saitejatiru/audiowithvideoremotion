@@ -44,12 +44,16 @@ def call_llm(
         api_key=api_key or LLM_API_KEY,
         base_url=base_url or LLM_BASE_URL,
     )
+    # 2048 truncates multi-scene storyboards (each scene has title/bullets/
+    # animation_brief) → broken JSON → fallback to plain text. 8192 fits ~40
+    # rich scenes; long scripts need the headroom.
+    max_tokens = 8192
     try:
         response = client.chat.completions.create(
             model=model or LLM_MODEL,
             messages=messages,
             response_format={"type": "json_object"},
-            max_tokens=2048,
+            max_tokens=max_tokens,
             temperature=0.3,
         )
     except Exception:
@@ -58,7 +62,7 @@ def call_llm(
         response = client.chat.completions.create(
             model=model or LLM_MODEL,
             messages=messages,
-            max_tokens=2048,
+            max_tokens=max_tokens,
             temperature=0.3,
         )
     # Guard against None content (Pitfall 2)

@@ -105,28 +105,37 @@ def parse_and_validate(
             items = items + _bullet_fallback(sentences[len(items):])
         return items
 
+    def _items_from(data) -> list[LLMSceneItem]:
+        """Validate scenes one-by-one, keeping the good ones. A single malformed
+        scene (e.g. a truncated tail item) must NOT discard the whole response."""
+        raw = data.get("scenes") if isinstance(data, dict) else data
+        if not isinstance(raw, list):
+            return []
+        good = []
+        for item in raw:
+            try:
+                good.append(LLMSceneItem.model_validate(item))
+            except Exception:
+                continue  # drop the bad scene; _fit pads it back as a bullet
+        return good
+
     # Layer 1: strict parse
     try:
-        data = json.loads(content)
-        items = LLMScenesResponse.model_validate(data).scenes
+        items = _items_from(json.loads(content))
         if items:
             return _fit(items)
-    except (json.JSONDecodeError, ValidationError, Exception) as e:
+    except Exception as e:
         logger.warning("Strict parse failed: %s — trying repair", e)
 
-    # Layer 2: json-repair then validate
+    # Layer 2: json-repair then per-item validate
     try:
         from json_repair import repair_json
 
         repaired = repair_json(content)
-        # repair_json may return a string or a parsed object
-        if isinstance(repaired, str):
-            data = json.loads(repaired)
-        else:
-            data = repaired
-        items = LLMScenesResponse.model_validate(data).scenes
+        data = json.loads(repaired) if isinstance(repaired, str) else repaired
+        items = _items_from(data)
         if items:
-            logger.info("Repair succeeded — %d scenes recovered", len(items))
+            logger.info("Repair succeeded — %d valid scenes recovered", len(items))
             return _fit(items)
     except Exception as e:
         logger.warning("Repair also failed: %s — falling back to bullets", e)

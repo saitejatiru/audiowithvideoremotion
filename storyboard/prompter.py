@@ -68,10 +68,11 @@ def build_system_prompt(
         + (
             "- ANIMATION-FIRST MODE: prefer 'animation' as the PRIMARY visual. "
             "For EVERY sentence that describes motion, change, a process, a "
-            "relationship, or a quantity, use visual_type 'animation' with a rich "
-            "animation_brief. Aim for MOST scenes to be animations. Only fall back "
-            "to 'diagram' for fixed labeled structures (anatomy) or 'bullet' for "
-            "pure definitions.\n"
+            "relationship, or a quantity, use visual_type 'animation'. Aim for "
+            "MOST scenes to be animations. Only fall back to 'diagram' for fixed "
+            "labeled structures (anatomy) or 'bullet' for pure definitions. "
+            "Keep each animation_brief to ONE sentence (max 25 words) to stay "
+            "within output limits.\n"
             if animate_first else
             "  Use 'animation' where motion genuinely aids understanding "
             "(great for Physics/Maths).\n"
