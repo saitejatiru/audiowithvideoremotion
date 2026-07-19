@@ -48,6 +48,10 @@ def build_ui():
                             value="Whiteboard (scribe)",
                             label="Explanation Style"
                         )
+                        animate_checkbox = gr.Checkbox(
+                            value=True,
+                            label="Prefer 2D animation (Manim) — best for Physics/Maths, slower render",
+                        )
                         with gr.Row():
                             subject_dropdown = gr.Dropdown(
                                 choices=["Auto-detect", "Mathematics", "Physics",
@@ -75,7 +79,7 @@ def build_ui():
                 generate_btn.click(
                     fn=orchestrate_video,
                     inputs=[script_input, voice_dropdown, backend_url, format_radio,
-                            subject_dropdown, grade_dropdown, style_radio],
+                            subject_dropdown, grade_dropdown, style_radio, animate_checkbox],
                     outputs=[status_output, video_output],
                 )
 

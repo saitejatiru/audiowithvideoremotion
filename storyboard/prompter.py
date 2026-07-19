@@ -8,7 +8,11 @@ import json
 from storyboard.schema import LLMScenesResponse
 
 
-def build_system_prompt(subject: str = "Auto-detect", grade: str = "Auto-detect") -> str:
+def build_system_prompt(
+    subject: str = "Auto-detect",
+    grade: str = "Auto-detect",
+    animate_first: bool = False,
+) -> str:
     """Build the system prompt with the embedded JSON schema.
 
     Includes "json" in the prompt text — required by DeepSeek when using
@@ -16,6 +20,8 @@ def build_system_prompt(subject: str = "Auto-detect", grade: str = "Auto-detect"
 
     subject/grade: "Auto-detect" tells the LLM to infer both from the script;
     anything else is injected as the explicit audience.
+    animate_first: when True, push the LLM to make 'animation' the PRIMARY
+    visual (2D-animation-heavy video) instead of using it sparingly.
     """
     schema = LLMScenesResponse.model_json_schema()
 
@@ -54,12 +60,23 @@ def build_system_prompt(subject: str = "Auto-detect", grade: str = "Auto-detect"
         "  'diagram' — for physical structures or apparatus (heart, cell, circuit, "
         "ray optics, plant parts): visual_query must be a precise labeled-diagram "
         "search term, e.g. 'human heart labeled diagram'.\n"
-        "  'animation' — for DYNAMIC Physics/Maths concepts that are best shown "
+        "  'animation' — a 2D animated scene (Manim) for concepts best shown "
         "MOVING: forces/motion, waves, projectile paths, geometry, graphs being "
-        "plotted, vectors. Put a clear step-by-step description in animation_brief "
-        "(what appears, what moves, in what order). Use SPARINGLY — at most 1-2 per "
-        "video, only where motion truly aids understanding.\n"
-        "- title: a punchy 2-5 word heading, NOT a copy of the sentence.\n"
+        "plotted, vectors, cycles, step-by-step processes. Put a clear "
+        "step-by-step description in animation_brief (what appears, what moves, "
+        "in what order).\n"
+        + (
+            "- ANIMATION-FIRST MODE: prefer 'animation' as the PRIMARY visual. "
+            "For EVERY sentence that describes motion, change, a process, a "
+            "relationship, or a quantity, use visual_type 'animation' with a rich "
+            "animation_brief. Aim for MOST scenes to be animations. Only fall back "
+            "to 'diagram' for fixed labeled structures (anatomy) or 'bullet' for "
+            "pure definitions.\n"
+            if animate_first else
+            "  Use 'animation' where motion genuinely aids understanding "
+            "(great for Physics/Maths).\n"
+        )
+        + "- title: a punchy 2-5 word heading, NOT a copy of the sentence.\n"
         "- bullets: short key points (max 6 words each); stage names for 'steps'.\n"
         "- emoji: exactly ONE emoji that captures the concept.\n"
         "- on_screen_text: one concise takeaway line (max 12 words), NOT the full sentence.\n"

@@ -62,6 +62,7 @@ def storyboard_pipeline(
     output_path: str | None = None,
     subject: str = "Auto-detect",
     grade: str = "Auto-detect",
+    animate_first: bool = False,
 ) -> dict:
     """Run the full storyboard generation pipeline.
 
@@ -87,7 +88,7 @@ def storyboard_pipeline(
         return timeline
 
     # Build prompts
-    system_prompt = build_system_prompt(subject=subject, grade=grade)
+    system_prompt = build_system_prompt(subject=subject, grade=grade, animate_first=animate_first)
     user_prompt = build_user_prompt(sentences)
     messages = [
         {"role": "system", "content": system_prompt},

@@ -57,6 +57,7 @@ def orchestrate_video(
     subject: str = "Auto-detect",
     grade: str = "Auto-detect",
     style: str = "Whiteboard (scribe)",
+    animate_first: bool = True,
 ):
     """Generator that runs the full pipeline and yields progress updates.
 
@@ -124,7 +125,7 @@ def orchestrate_video(
                 f"[align: {meta.get('alignMethod', '?')}, wer: {meta.get('wer', '?')}]"
             ), None
             # We don't retry LLM here, the storyboard pipeline handles its own repairs.
-            storyboard_pipeline(t_data, subject=subject, grade=grade)
+            storyboard_pipeline(t_data, subject=subject, grade=grade, animate_first=animate_first)
         except Exception as e:
             logger.error("Storyboard failed: %s", traceback.format_exc())
             yield f"Error: Storyboard generation failed — {e}", None
