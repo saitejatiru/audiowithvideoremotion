@@ -26,7 +26,7 @@ class LLMSceneItem(BaseModel):
     on_screen_text: str
     visual_type: Literal[
         "bullet", "image", "code", "big-number", "comparison",
-        "chart", "steps", "formula", "diagram",
+        "chart", "steps", "formula", "diagram", "animation",
     ]
     visual_query: str
     title: str = ""              # short 2-5 word heading for the scene
@@ -35,6 +35,7 @@ class LLMSceneItem(BaseModel):
     chart_labels: list[str] = []  # chart only: 2-6 short labels
     chart_values: list[float] = []  # chart only: numbers matching labels
     formula: str = ""            # formula only: LaTeX without $ delimiters
+    animation_brief: str = ""    # animation only: what to animate (Manim 2D)
 
     @field_validator("chart_values", mode="before")
     @classmethod
@@ -64,6 +65,8 @@ class LLMSceneItem(BaseModel):
             self.visual_type = "bullet"
         if self.visual_type == "formula" and not self.formula.strip():
             self.visual_type = "bullet"
+        if self.visual_type == "animation" and not self.animation_brief.strip():
+            self.visual_type = "bullet"
         return self
 
 
@@ -89,3 +92,4 @@ class TimelineScene(BaseModel):
     emoji: str = ""
     chart: dict = {}           # {"labels": [...], "values": [...]} for chart scenes
     formula: str = ""          # LaTeX for formula scenes
+    animation_brief: str = ""  # Manim animation description for animation scenes

@@ -47,6 +47,7 @@ def inject_timing(
             emoji=item.emoji,
             chart={"labels": item.chart_labels, "values": item.chart_values},
             formula=item.formula,
+            animation_brief=item.animation_brief,
         )
         result.append(scene.model_dump())
     return result

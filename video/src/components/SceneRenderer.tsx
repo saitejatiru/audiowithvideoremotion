@@ -211,8 +211,8 @@ const Bullets: React.FC<{ items: string[]; accent: string; style: SceneStyle }> 
 const SceneBackground: React.FC<{ scene: TimelineScene }> = ({ scene }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const { asset, assetKind, type } = scene.visual;
-  if (!asset || type === "diagram") return null;
+  const { asset, assetKind, type, manim } = scene.visual;
+  if (!asset || type === "diagram" || manim) return null;
 
   const zoom = interpolate(frame, [0, fps * 10], [1.05, 1.15], {
     extrapolateRight: "clamp",
@@ -321,6 +321,17 @@ const SceneContent: React.FC<{
   const entrance = useEntrance(6);
   const emoji = scene.emoji || "";
   const bullets = scene.bullets ?? [];
+
+  // Manim 2D-animation clip → play it full-frame; the animation IS the scene.
+  // Captions still overlay from CaptionRenderer, so it stays synced + narrated.
+  if (scene.visual.manim && scene.visual.asset) {
+    return (
+      <OffthreadVideo
+        src={staticFile(scene.visual.asset)}
+        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+      />
+    );
+  }
 
   // Whiteboard with a drawable image → the scribe sketch layout, regardless of
   // template. The drawing IS the explanation; text supports it.

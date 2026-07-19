@@ -38,11 +38,13 @@ export interface SceneVisual {
     | "chart"
     | "steps"
     | "formula"
-    | "diagram";
+    | "diagram"
+    | "animation";
   query: string;
   image?: string; // public/-relative diagram file (diagram scenes only)
   asset?: string; // public/-relative background illustration/video file
   assetKind?: "image" | "video"; // how to render `asset`
+  manim?: boolean; // asset is a full-frame Manim 2D-animation clip
   credit?: string; // license attribution
 }
 

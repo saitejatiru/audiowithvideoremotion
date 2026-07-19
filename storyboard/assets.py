@@ -135,6 +135,8 @@ def fetch_scene_assets(timeline: dict, out_dir: str) -> dict:
 
     for scene in timeline.get("scenes", []):
         visual = scene.get("visual", {})
+        if visual.get("manim") or visual.get("asset"):
+            continue  # a Manim clip already claimed this scene's visual
         query = (visual.get("query") or scene.get("title") or "").strip()
         idx = scene.get("idx", 0)
         if not query:

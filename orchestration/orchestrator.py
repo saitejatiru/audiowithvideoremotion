@@ -144,6 +144,16 @@ def orchestrate_video(
                 return
             yield f"WARNING: LLM storyboard failed ({err}) — rendering heuristic scenes.", None
 
+        # Render Manim 2D animations for 'animation' scenes (Physics/Maths).
+        # Slow + can fail → fail-soft to bullet inside. Runs before asset fetch
+        # so a rendered clip claims the scene's visual.
+        yield "Step 3/5: Rendering 2D animations (Manim)...", None
+        try:
+            from storyboard.manim_gen import render_manim_scenes
+            render_manim_scenes(t_data, run_dir)
+        except Exception:
+            logger.warning("Manim render skipped: %s", traceback.format_exc())
+
         # Fetch real visuals per scene: Wikimedia diagrams + Pixabay
         # illustrations/video (per-scene no-ops on failure; belt-and-suspenders
         # try so it can never kill the pipeline)
