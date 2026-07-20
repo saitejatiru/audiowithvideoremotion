@@ -7,6 +7,7 @@ Handles transient failures via tenacity and yields progress updates for Gradio.
 """
 import json
 import os
+import shutil
 import tempfile
 import traceback
 import logging
@@ -217,8 +218,28 @@ def orchestrate_video(
             yield f"Error: Post-processing failed — {e}", None
             return
 
+        # Save a STABLE copy the user can actually grab. The render lives in a
+        # temp dir (auto-deleted) and the Colab iframe proxy can't reliably serve
+        # video for playback/download — so copy it out to Google Drive (mounted)
+        # where it just appears in the user's Drive, no proxy needed.
+        saved_path, where = final_path, "the run dir"
+        try:
+            import datetime
+            drive_dir = "/content/drive/MyDrive/explainer_videos"
+            content_dir = "/content/explainer_videos"
+            out_base = drive_dir if os.path.isdir("/content/drive/MyDrive") else content_dir
+            os.makedirs(out_base, exist_ok=True)
+            stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            dest = os.path.join(out_base, f"video_{stamp}.mp4")
+            shutil.copy2(final_path, dest)  # only adopt the new path if this succeeds
+            saved_path = dest
+            where = ("Google Drive → explainer_videos"
+                     if out_base == drive_dir else "/content/explainer_videos (Colab file panel)")
+        except Exception:
+            logger.warning("Could not save output copy: %s", traceback.format_exc())
+
         # Done
-        yield "Complete! Video generated successfully.", final_path
+        yield f"Complete! Saved to {where}: {os.path.basename(saved_path)}", saved_path
 
     except Exception as e:
         logger.error("Unexpected error in pipeline: %s", traceback.format_exc())

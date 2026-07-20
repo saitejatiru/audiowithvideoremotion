@@ -31,7 +31,10 @@ RULES (strict):
 - 6-12 seconds, explain the concept step by step with short Text labels."""
 
 _ATTEMPTS = 3
-_TIMEOUT = 240  # seconds per render
+_TIMEOUT = 300  # seconds per render
+# -ql = 480p15 (low quality) renders ~4x faster than -qm on Colab's CPU. A
+# finished low-res animation beats a medium-res one that times out to a bullet.
+_QUALITY = "-ql"
 
 
 def _gen_code(brief: str, err: str | None, prev: str | None) -> str:
@@ -77,7 +80,7 @@ def render_manim_scenes(timeline: dict, out_dir: str) -> dict:
                 f.write(src)
             try:
                 p = subprocess.run(
-                    ["manim", "-qm", "--format=mp4", "--media_dir", out_dir, script, "GenScene"],
+                    ["manim", _QUALITY, "--format=mp4", "--media_dir", out_dir, script, "GenScene"],
                     capture_output=True, text=True, timeout=_TIMEOUT,
                 )
             except subprocess.TimeoutExpired:
