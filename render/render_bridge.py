@@ -110,6 +110,8 @@ def render_video(
             cwd=str(project_dir),
             capture_output=True,
             text=True,
+            encoding="utf-8",      # Remotion prints emoji; default cp1252 on
+            errors="replace",      # Windows crashes the stderr reader thread
             timeout=600,  # 10 minute timeout for rendering
         )
     except subprocess.TimeoutExpired:
