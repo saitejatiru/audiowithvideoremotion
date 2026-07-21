@@ -225,16 +225,30 @@ def orchestrate_video(
         saved_path, where = final_path, "the run dir"
         try:
             import datetime
-            drive_dir = "/content/drive/MyDrive/explainer_videos"
-            content_dir = "/content/explainer_videos"
-            out_base = drive_dir if os.path.isdir("/content/drive/MyDrive") else content_dir
+            # Where to drop the finished video, most-specific first:
+            #   VIDEO_OUTPUT_DIR env (Kaggle sets /kaggle/working/...) >
+            #   Colab Google Drive > Kaggle working > Colab /content > cwd.
+            out_base = os.environ.get("VIDEO_OUTPUT_DIR", "").strip()
+            if not out_base:
+                if os.path.isdir("/content/drive/MyDrive"):
+                    out_base = "/content/drive/MyDrive/explainer_videos"
+                elif os.path.isdir("/kaggle/working"):
+                    out_base = "/kaggle/working/explainer_videos"
+                elif os.path.isdir("/content"):
+                    out_base = "/content/explainer_videos"
+                else:
+                    out_base = os.path.join(os.getcwd(), "explainer_videos")
             os.makedirs(out_base, exist_ok=True)
             stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             dest = os.path.join(out_base, f"video_{stamp}.mp4")
             shutil.copy2(final_path, dest)  # only adopt the new path if this succeeds
             saved_path = dest
-            where = ("Google Drive → explainer_videos"
-                     if out_base == drive_dir else "/content/explainer_videos (Colab file panel)")
+            if "drive/MyDrive" in out_base:
+                where = "Google Drive → explainer_videos"
+            elif "kaggle" in out_base:
+                where = "the Kaggle Output panel (/kaggle/working/explainer_videos)"
+            else:
+                where = out_base
         except Exception:
             logger.warning("Could not save output copy: %s", traceback.format_exc())
 
