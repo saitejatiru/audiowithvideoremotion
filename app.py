@@ -73,7 +73,7 @@ def build_ui():
 
                     with gr.Column():
                         status_output = gr.Textbox(label="Pipeline Status", interactive=False)
-                        video_output = gr.Video(label="Generated Video")
+                        video_output = gr.Video(label="Generated Video", show_download_button=True)
 
                 # Connect the generator function to the UI button
                 generate_btn.click(
@@ -115,8 +115,19 @@ def build_ui():
 
 if __name__ == "__main__":
     app = build_ui()
+    # Gradio only serves files from cwd/temp by default; the finished video is
+    # saved to Drive/Kaggle output dirs, so whitelist them or the Video output
+    # 404s with InvalidPathError.
+    allowed = [
+        os.environ.get("VIDEO_OUTPUT_DIR", ""),
+        "/content/drive/MyDrive/explainer_videos",
+        "/kaggle/working/explainer_videos",
+        "/content/explainer_videos",
+        "/tmp",
+    ]
     app.launch(
         server_name="0.0.0.0",
         server_port=int(os.environ.get("PORT", 7860)),
         share=os.environ.get("GRADIO_SHARE") == "1",
+        allowed_paths=[p for p in allowed if p],
     )
